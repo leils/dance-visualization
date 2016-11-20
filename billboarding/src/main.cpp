@@ -135,16 +135,12 @@ void SetMaterial(int i)
     glUniform3f(prog->getUniform("MatDif"), 0.0, 0.76, 0.9);
     glUniform3f(prog->getUniform("MatSpec"), 0.0, 0.0, 0.0);
     glUniform1f(prog->getUniform("shine"), 00.0);
-    //set specular to: (0.14, 0.2, 0.8);
-    //set shine to: (120.0);
     break;
   case 1: // pink fur
     glUniform3f(prog->getUniform("MatAmb"), 0.53, 0.13, 0.14);
     glUniform3f(prog->getUniform("MatDif"), 0.5, 0.2, 0.2);
     glUniform3f(prog->getUniform("MatSpec"), 0.3, 0.3, 0.4);
     glUniform1f(prog->getUniform("shine"), 4.0);
-    //set specular to: (0.3, 0.3, 0.4);
-    //set shine to: (4.0);
     break;
   }
 }
@@ -172,6 +168,7 @@ static void init()
   // Enable z-buffer test.
   glEnable(GL_DEPTH_TEST);
 
+  initGeom();
 
   cube = make_shared<Shape>();
   cube->loadMesh(RESOURCE_DIR + "cube.obj");
@@ -187,6 +184,8 @@ static void init()
   prog->addUniform("P");
   prog->addUniform("M");
   prog->addUniform("V");
+
+  /* Eventually just take this out */
   prog->addUniform("MatAmb");
   prog->addUniform("MatDif");
   prog->addUniform("MatSpec");
@@ -209,10 +208,11 @@ static void render()
   //Use the matrix stack for Lab 6
   float aspect = width / (float)height;
 
-  // Create the matrix stacks - please leave these alone for now
+  // Create the matrix stacks 
   auto P = make_shared<MatrixStack>();
   auto M = make_shared<MatrixStack>();
   auto V = make_shared<MatrixStack>();
+
   // Apply perspective projection.
   P->pushMatrix();
   P->perspective(45.0f, aspect, 0.01f, 100.0f);
@@ -229,16 +229,25 @@ static void render()
   V->lookAt(eye, lookAtPt, up);
   glUniformMatrix4fv(prog->getUniform("V"), 1, GL_FALSE, V->topMatrix().data());
 
-  SetMaterial(0);
   M->pushMatrix();
   M->loadIdentity();
 
+  //draw the triangle
+  SetMaterial(0);
+  //set up pulling of vertices
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+  //function to get # of elements at a time
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+  glDrawArrays(GL_TRIANGLES, 0, 9);
+  glDisableVertexAttribArray(0);
+
   //draw the cube with these 'global transforms'
   SetMaterial(1);
-  M->translate(Vector3f(0, 0, -5));
+  //M->translate(Vector3f(0, 0, -5));
     glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
-    cube->draw(prog);
-  M->popMatrix();
+    //cube->draw(prog);
+  //M->popMatrix();
 
   // Pop matrix stacks.
   P->popMatrix();
