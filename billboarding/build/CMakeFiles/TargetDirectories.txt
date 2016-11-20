@@ -1,0 +1,3 @@
+/Users/leia/471_res/glfw-3.1.2/debug/src/CMakeFiles/glfw.dir
+/Users/leia/471_res/glfw-3.1.2/debug/CMakeFiles/uninstall.dir
+/Users/leia/Documents/repos/sproj/billboarding/build/CMakeFiles/p3.dir
