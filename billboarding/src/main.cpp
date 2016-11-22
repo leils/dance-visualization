@@ -91,31 +91,22 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
     lock_view = !lock_view;
   } else if (key == GLFW_KEY_Y && action == GLFW_PRESS) {
     lock_y = !lock_y;
-  }
+  } else if (key == GLFW_KEY_RIGHT) {
+    // theta defines l/r of the view. Positive to the right.
+    theta += .1;
+  } else if (key == GLFW_KEY_LEFT) {
+    theta -= .1;
+  } else if (key == GLFW_KEY_UP) {
+    // phi defines u/d of the view. Positive up.
+    phi += .1;
+  } else if (key == GLFW_KEY_DOWN) {
+    phi -= .1;
+  } 
 
 }
 
 static void mouse_track(GLFWwindow *window) {
-  /* I should update this to use keypress, since mouse callback 
-    is really hard to make right. 
-    */ 
-  double posX, posY;
-  glfwGetCursorPos(window, &posX, &posY);
-
-  float dy = -(posY - (g_height / 2)) / (g_height / 2);
-  float dx = (posX - (g_width / 2)) / (g_width / 2);
-
-  if (!lock_view) {
-    theta += M_PI * (dx / 400);
-    phi += M_PI * (dy / 400);
-  }
-
-  if (phi < -1.4) {
-    phi = -1.4;
-  }
-  else if (phi > 1.4) {
-    phi = 1.4;
-  }
+  /* Removed viewpoint mechanics here */
 }
 
 
@@ -244,10 +235,10 @@ static void render()
 
   //draw the cube with these 'global transforms'
   SetMaterial(1);
-  //M->translate(Vector3f(0, 0, -5));
+  M->translate(Vector3f(0, 0, -5));
     glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
     //cube->draw(prog);
-  //M->popMatrix();
+  M->popMatrix();
 
   // Pop matrix stacks.
   P->popMatrix();
