@@ -11,6 +11,8 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #include "MatrixStack.h"
 #include "shape.h"
 
+#define NUM_COORDS 3 * 3
+
 /* Should I be using shapes? 
    Like ... we've only ever imported shapes from files. 
    The "shape" is there to interpret the mesh. 
@@ -30,21 +32,37 @@ GLFWwindow *window; // Main application window
 string RESOURCE_DIR = ""; // Where the resources are loaded from
 shared_ptr<Program> prog;
 
-GLuint VertexArrayID;
-static const GLfloat g_vertex_buffer_data[] = {
+GLuint VertexArrayID2;
+static const GLfloat g_vertex_buffer_data2[] = {
   -1.0f, -1.0f, 0.0f,
   1.0f, -1.0f, 0.0f,
-  0.0f, 1.0f, 0.0f
-};
-GLuint vertexbuffer; 
+  0.0f, 1.0f, 0.0f,
 
-shared_ptr<Shape> cube;
+  1.0f, -1.0f, 0.0f,
+  0.0f, 1.0f, 0.0f, 
+  2.0f, 1.0f, 0.0f
+};
+GLuint vertexbuffer2; 
+
+static GLfloat orig_vertex_buffer[] = {
+  -1.0f, -1.0f, 0.0f,
+  0.0f, 0.0f, 0.0f,
+  1.0f, 1.0f, 0.0f
+};
+
+GLuint VertexArrayID;
+// Array to fill with the converted vertices
+static GLfloat g_vertex_buffer_data[NUM_COORDS * 3];
+GLuint vertexbuffer; 
 
 int g_width, g_height;
 float sTheta;
+// TODO (leia): remove
 int gMat = 0;
 int light_x = -2;
 int t = 0;
+
+// Eye vectors for viewpoint moving 
 Vector3f eye = Vector3f();
 Vector3f lookAtPt = Vector3f();
 Vector3f up = Vector3f(0, 1, 0);
@@ -80,29 +98,28 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, GL_TRUE);
   } else if (key == GLFW_KEY_A) {
-    eye -= eye_right / 5;
+    eye -= eye_right / 5; // Move eye left
   } else if (key == GLFW_KEY_D) {
-    eye += eye_right / 5;
+    eye += eye_right / 5; // Move eye right
   } else if (key == GLFW_KEY_W) {
-    eye += eye_forward / 5;
+    eye += eye_forward / 5; // Move eye forward
   } else if (key == GLFW_KEY_S) {
-    eye -= eye_forward / 5;
+    eye -= eye_forward / 5; // Move eye backward
   } else if (key == GLFW_KEY_L && action == GLFW_PRESS) {
-    lock_view = !lock_view;
+    lock_view = !lock_view; // lock the viewpoint
   } else if (key == GLFW_KEY_Y && action == GLFW_PRESS) {
-    lock_y = !lock_y;
+    lock_y = !lock_y; // lock the eye in the y axis
   } else if (key == GLFW_KEY_RIGHT) {
     // theta defines l/r of the view. Positive to the right.
-    theta += .1;
+    theta += .1; // turn eye to the right
   } else if (key == GLFW_KEY_LEFT) {
-    theta -= .1;
+    theta -= .1; // turn the eye to the left
   } else if (key == GLFW_KEY_UP) {
     // phi defines u/d of the view. Positive up.
-    phi += .1;
+    phi += .1; // turn the eye upward
   } else if (key == GLFW_KEY_DOWN) {
-    phi -= .1;
+    phi -= .1; // turn the eye downward
   } 
-
 }
 
 static void mouse_track(GLFWwindow *window) {
@@ -119,7 +136,7 @@ static void resize_callback(GLFWwindow *window, int width, int height) {
 //helper function to set materials
 void SetMaterial(int i) 
 {
-
+  // TODO (leia): remove this when I change the shader 
   switch (i) {
   case 0: // grass
     glUniform3f(prog->getUniform("MatAmb"), 0.02, 0.54, 0.2);
@@ -136,17 +153,83 @@ void SetMaterial(int i)
   }
 }
 
+static void printVertices() {
+  for (int i = 0; i < NUM_COORDS; i++) {
+    printf("VERTEX: %f\n", (float)(orig_vertex_buffer[i]));
+  }
+}
+
+static void convertVertices() {
+  GLfloat ax, ay, az, prime_ay, bx, by, bz, prime_by;
+  int j = 0;
+  for (int i = 0; i < NUM_COORDS - 3; i = i + 3) {
+    ax = orig_vertex_buffer[i];
+    ay = orig_vertex_buffer[i + 1];
+    az = orig_vertex_buffer[i + 2];
+    bx = orig_vertex_buffer[i + 3];
+    by = orig_vertex_buffer[i + 4];
+    bz = orig_vertex_buffer[i + 5];
+    prime_ay = ay - .5;
+    prime_by = by - .5;
+
+    // Push A
+    g_vertex_buffer_data[j] = ax;
+    g_vertex_buffer_data[j++] = ay;
+    g_vertex_buffer_data[j++] = az;
+
+    // Push A' 
+    g_vertex_buffer_data[j++] = ax;
+    g_vertex_buffer_data[j++] = prime_ay;
+    g_vertex_buffer_data[j++] = az;
+
+    // Push B 
+    g_vertex_buffer_data[j++] = bx;
+    g_vertex_buffer_data[j++] = by;
+    g_vertex_buffer_data[j++] = bz;
+
+    // Push B 
+    g_vertex_buffer_data[j++] = bx;
+    g_vertex_buffer_data[j++] = by;
+    g_vertex_buffer_data[j++] = bz;
+
+    // Push A' 
+    g_vertex_buffer_data[j++] = ax;
+    g_vertex_buffer_data[j++] = prime_ay;
+    g_vertex_buffer_data[j++] = az;
+
+    // Push B'
+    g_vertex_buffer_data[j++] = bx;
+    g_vertex_buffer_data[j++] = prime_by;
+    g_vertex_buffer_data[j++] = bz;
+
+  }
+}
+
 static void initGeom() {
   //generate the VAO
   glGenVertexArrays(1, &VertexArrayID);
   glBindVertexArray(VertexArrayID);
 
   //generate vertex buffer to hand off to OGL
+  /* TODO (leia): do the vertex buffer change here. Since each vertex is passed in via
+      three floats, I'll have to deal with them in triplets. 
+      Do I need to write some extra helper functions to do that? 
+      I might want to. 
+
+      Remember that cpp doesn't allow arrays to be mutated. 
+      dynamic arrays? 
+      I shouldn't even need dynamic: we know the fixed size. 
+      */
+
+  printVertices();
+  convertVertices();
+
   glGenBuffers(1, &vertexbuffer);
   //set the current state to focus on our vertex buffer
   glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
   //actually memcopy the data - only do this once
-  glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+  //glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(orig_vertex_buffer), orig_vertex_buffer, GL_DYNAMIC_DRAW);
 }
 
 static void init()
@@ -161,12 +244,6 @@ static void init()
 
   initGeom();
 
-  cube = make_shared<Shape>();
-  cube->loadMesh(RESOURCE_DIR + "cube.obj");
-  cube->resize();
-  cube->compute_normals(RESOURCE_DIR + "cube.obj");
-  cube->init();
-
   // Initialize the GLSL program.
   prog = make_shared<Program>();
   prog->setVerbose(true);
@@ -176,7 +253,7 @@ static void init()
   prog->addUniform("M");
   prog->addUniform("V");
 
-  /* Eventually just take this out */
+  /* TODO(leia): Eventually just take this out */
   prog->addUniform("MatAmb");
   prog->addUniform("MatDif");
   prog->addUniform("MatSpec");
@@ -196,7 +273,6 @@ static void render()
   // Clear framebuffer.
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  //Use the matrix stack for Lab 6
   float aspect = width / (float)height;
 
   // Create the matrix stacks 
@@ -213,7 +289,7 @@ static void render()
   glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
   glUniform1i(prog->getUniform("light_x"), light_x);
 
-  mouse_track(window);
+  // mouse_track(window);
   lookAtPt = Vector3f(cos(phi) * cos (theta), sin(phi), cos(phi) * cos((M_PI / 2) - theta)) + eye;
   calculate_directions();
 
@@ -223,8 +299,8 @@ static void render()
   M->pushMatrix();
   M->loadIdentity();
 
-  //draw the triangle
-  SetMaterial(0);
+  //draw the triangles
+  SetMaterial(1);
   //set up pulling of vertices
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -301,7 +377,7 @@ int main(int argc, char **argv)
   //set the window resize call back
   glfwSetFramebufferSizeCallback(window, resize_callback);
 
-  // Initialize scene. Note geometry initialized in init now
+  // Initialize scene. Note that geometry initialized in init now
   init();
 
   // Loop until the user closes the window.
