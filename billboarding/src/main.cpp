@@ -154,8 +154,16 @@ void SetMaterial(int i)
 }
 
 static void printVertices() {
+  printf("Original vertices: \n");
   for (int i = 0; i < NUM_COORDS; i++) {
-    printf("VERTEX: %f\n", (float)(orig_vertex_buffer[i]));
+    printf("OG_VERTEX: %f\n", (float)(orig_vertex_buffer[i]));
+  }
+}
+
+static void printNewVertices() {
+  printf("New vertices: \n");
+  for (int i = 0; i < NUM_COORDS * 3; i++) {
+    printf("%f\n", (float)(g_vertex_buffer_data[i]));
   }
 }
 
@@ -173,7 +181,7 @@ static void convertVertices() {
     prime_by = by - .5;
 
     // Push A
-    g_vertex_buffer_data[j] = ax;
+    g_vertex_buffer_data[j++] = ax;
     g_vertex_buffer_data[j++] = ay;
     g_vertex_buffer_data[j++] = az;
 
@@ -203,6 +211,7 @@ static void convertVertices() {
     g_vertex_buffer_data[j++] = bz;
 
   }
+  printf("Converted vertices\n");
 }
 
 static void initGeom() {
@@ -223,13 +232,14 @@ static void initGeom() {
 
   printVertices();
   convertVertices();
+  printNewVertices();
 
   glGenBuffers(1, &vertexbuffer);
   //set the current state to focus on our vertex buffer
   glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
   //actually memcopy the data - only do this once
-  //glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(orig_vertex_buffer), orig_vertex_buffer, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+  //glBufferData(GL_ARRAY_BUFFER, sizeof(orig_vertex_buffer), orig_vertex_buffer, GL_DYNAMIC_DRAW);
 }
 
 static void init()
