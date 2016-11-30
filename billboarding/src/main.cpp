@@ -11,7 +11,8 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #include "MatrixStack.h"
 #include "shape.h"
 
-#define NUM_COORDS 3 * 3
+#define NUM_COORDS (6 * 3)
+#define NUM_MULT 6
 
 /* Should I be using shapes? 
    Like ... we've only ever imported shapes from files. 
@@ -46,13 +47,16 @@ GLuint vertexbuffer2;
 
 static GLfloat orig_vertex_buffer[] = {
   -1.0f, -1.0f, 0.0f,
-  0.0f, 0.0f, 0.0f,
-  1.0f, 1.0f, 0.0f
+  0.0f, 0.0f, 0.3f,
+  1.0f, 1.0f, 0.0f,
+  2.0f, 1.0f, -0.4f,
+  3.0f, 0.0f, 1.0f,
+  4.0f, 0.0f, 1.5f,
 };
 
 GLuint VertexArrayID;
 // Array to fill with the converted vertices
-static GLfloat g_vertex_buffer_data[NUM_COORDS * 3];
+static GLfloat g_vertex_buffer_data[NUM_COORDS * NUM_MULT];
 GLuint vertexbuffer; 
 
 int g_width, g_height;
@@ -162,15 +166,17 @@ static void printVertices() {
 
 static void printNewVertices() {
   printf("New vertices: \n");
-  for (int i = 0; i < NUM_COORDS * 3; i++) {
-    printf("%f\n", (float)(g_vertex_buffer_data[i]));
+  for (int i = 0; i < NUM_COORDS * NUM_MULT; i++) {
+    printf("i = %d: %f\n", i, (float)(g_vertex_buffer_data[i]));
   }
+  printf("done printing\n");
 }
 
 static void convertVertices() {
   GLfloat ax, ay, az, prime_ay, bx, by, bz, prime_by;
   int j = 0;
-  for (int i = 0; i < NUM_COORDS - 3; i = i + 3) {
+  int i;
+  for (i = 0; i < NUM_COORDS - 3; i = i + 3) {
     ax = orig_vertex_buffer[i];
     ay = orig_vertex_buffer[i + 1];
     az = orig_vertex_buffer[i + 2];
@@ -211,7 +217,7 @@ static void convertVertices() {
     g_vertex_buffer_data[j++] = bz;
 
   }
-  printf("Converted vertices\n");
+  printf("Converted vertices, i = %d\n", i);
 }
 
 static void initGeom() {
@@ -316,7 +322,7 @@ static void render()
   glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
   //function to get # of elements at a time
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-  glDrawArrays(GL_TRIANGLES, 0, 9);
+  glDrawArrays(GL_TRIANGLES, 0, NUM_COORDS * NUM_MULT);
   glDisableVertexAttribArray(0);
 
   //draw the cube with these 'global transforms'
