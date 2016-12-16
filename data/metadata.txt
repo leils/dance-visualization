@@ -1,0 +1,14 @@
+.c3d ***
+Header information:
+  parameter_block: 2
+      point_count: 43
+     analog_count: 0
+      first_frame: 71
+       last_frame: 472
+          max_gap: 0
+     scale_factor: -0.0500000007451
+       data_block: 14
+ analog_per_frame: 1
+       frame_rate: 60.0
+long_event_labels: 0
+      label_block: 0
