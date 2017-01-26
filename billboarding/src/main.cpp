@@ -33,7 +33,8 @@ GLFWwindow *window; // Main application window
 string RESOURCE_DIR = ""; // Where the resources are loaded from
 shared_ptr<Program> prog;
 
-static const GLfloat knee_buffer[] = {
+// RENAMED FOR TESTING
+static GLfloat knee_buffer[] = {
     0.749688720703,-6.72364624023,4.64307250977,
     0.747695159912,-6.72039611816,4.64551605225,
     0.746350479126,-6.71355224609,4.64519897461,
@@ -1030,6 +1031,7 @@ static void initGeom() {
 
   // printVertices();
   convertVertices(ankle_buffer, g_vertex_ankle_buffer);
+  convertVertices(knee_buffer, g_vertex_knee_buffer);
   // printNewVertices();
 
   glGenBuffers(1, &ankle_vertexbuffer);
@@ -1038,6 +1040,10 @@ static void initGeom() {
   //actually memcopy the data - only do this once
   glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_ankle_buffer), g_vertex_ankle_buffer, GL_DYNAMIC_DRAW);
   //glBufferData(GL_ARRAY_BUFFER, sizeof(ankle_buffer), ankle_buffer, GL_DYNAMIC_DRAW);
+
+  glGenBuffers(2, &knee_vertexbuffer);
+  glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_knee_buffer), g_vertex_knee_buffer, GL_DYNAMIC_DRAW);
 }
 
 static void init()
@@ -1113,6 +1119,12 @@ static void render()
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
   //function to get # of elements at a time
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+  glDrawArrays(GL_TRIANGLES, 0, NUM_COORDS * NUM_MULT);
+  glDisableVertexAttribArray(0);
+
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
   glDrawArrays(GL_TRIANGLES, 0, NUM_COORDS * NUM_MULT);
   glDisableVertexAttribArray(0);
