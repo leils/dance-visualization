@@ -855,7 +855,6 @@ int g_width, g_height;
 float sTheta;
 // TODO (leia): remove
 int gMat = 0;
-int light_x = -2;
 int t = 0;
 
 // Eye vectors for viewpoint moving
@@ -1040,7 +1039,6 @@ static void init()
   /* TODO(leia): Eventually just take this out */
   prog->addAttribute("vertPos");
   prog->addAttribute("vertNor");
-  prog->addUniform("light_x");
   prog->addUniform("knee");
 }
 
@@ -1068,7 +1066,6 @@ static void render()
   // bind this program, start drawing perspective
   prog->bind();
   glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
-  glUniform1i(prog->getUniform("light_x"), light_x);
   glUniform1i(prog->getUniform("knee"), false);
 
   // mouse_track(window);
@@ -1081,9 +1078,8 @@ static void render()
   M->pushMatrix();
   M->loadIdentity();
 
-  //NOT ACTUALLY DOING ANYTHING
-  M->translate(Vector3f(0, 0, -5));
-  // M->rotate(1, Vector3f(1, 0, 0));
+  M->translate(Vector3f(0, 0, -20));
+  M->rotate(1, Vector3f(0, 1, 0)); //NOT ACTUALLY DOING ANYTHING
   glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
   //draw the triangles
   //set up pulling of vertices
@@ -1100,13 +1096,10 @@ static void render()
   glDrawArrays(GL_TRIANGLES, 0, NUM_COORDS * NUM_MULT);
   glDisableVertexAttribArray(0);
 
-  //draw the cube with these 'global transforms'
-  // SetMaterial(1);
-  M->popMatrix();
-
   // Pop matrix stacks.
+  M->popMatrix();
   P->popMatrix();
-  //V->popMatrix();
+  // V->popMatrix();
 
   prog->unbind();
 
