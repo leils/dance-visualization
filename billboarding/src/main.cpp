@@ -33,7 +33,6 @@ GLFWwindow *window; // Main application window
 string RESOURCE_DIR = ""; // Where the resources are loaded from
 shared_ptr<Program> prog;
 
-// RENAMED FOR TESTING
 static GLfloat knee_buffer[] = {
     0.749688720703,-6.72364624023,4.64307250977,
     0.747695159912,-6.72039611816,4.64551605225,
@@ -1018,28 +1017,18 @@ static void initGeom() {
   glGenVertexArrays(1, &AnkleArrayID);
   glBindVertexArray(AnkleArrayID);
 
+  glGenVertexArrays(2, &KneeArrayID);
+  glBindVertexArray(KneeArrayID);
+
   //generate vertex buffer to hand off to OGL
-  /* TODO (leia): do the vertex buffer change here. Since each vertex is passed in via
-      three floats, I'll have to deal with them in triplets.
-      Do I need to write some extra helper functions to do that?
-      I might want to.
-
-      Remember that cpp doesn't allow arrays to be mutated.
-      dynamic arrays?
-      I shouldn't even need dynamic: we know the fixed size.
-      */
-
-  // printVertices();
   convertVertices(ankle_buffer, g_vertex_ankle_buffer);
   convertVertices(knee_buffer, g_vertex_knee_buffer);
-  // printNewVertices();
 
   glGenBuffers(1, &ankle_vertexbuffer);
   //set the current state to focus on our vertex buffer
   glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
   //actually memcopy the data - only do this once
   glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_ankle_buffer), g_vertex_ankle_buffer, GL_DYNAMIC_DRAW);
-  //glBufferData(GL_ARRAY_BUFFER, sizeof(ankle_buffer), ankle_buffer, GL_DYNAMIC_DRAW);
 
   glGenBuffers(2, &knee_vertexbuffer);
   glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
@@ -1075,6 +1064,7 @@ static void init()
   prog->addAttribute("vertPos");
   prog->addAttribute("vertNor");
   prog->addUniform("light_x");
+  prog->addUniform("knee");
 }
 
 static void render()
@@ -1102,6 +1092,7 @@ static void render()
   prog->bind();
   glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
   glUniform1i(prog->getUniform("light_x"), light_x);
+  glUniform1i(prog->getUniform("knee"), false);
 
   // mouse_track(window);
   lookAtPt = Vector3f(cos(phi) * cos (theta), sin(phi), cos(phi) * cos((M_PI / 2) - theta)) + eye;
@@ -1113,16 +1104,18 @@ static void render()
   M->pushMatrix();
   M->loadIdentity();
 
+  M->translate(Vector3f(0, 0, -5));
+  glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
   //draw the triangles
   SetMaterial(1);
   //set up pulling of vertices
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
-  //function to get # of elements at a time
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
   glDrawArrays(GL_TRIANGLES, 0, NUM_COORDS * NUM_MULT);
   glDisableVertexAttribArray(0);
 
+  glUniform1i(prog->getUniform("knee"), true);
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
@@ -1130,10 +1123,7 @@ static void render()
   glDisableVertexAttribArray(0);
 
   //draw the cube with these 'global transforms'
-  SetMaterial(1);
-  M->translate(Vector3f(0, 0, -5));
-    glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
-    //cube->draw(prog);
+  // SetMaterial(1);
   M->popMatrix();
 
   // Pop matrix stacks.

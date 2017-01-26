@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 # Name of the project
-project(p3)
+project(s)
 
 # Use glob to get the list of all source files.
 file(GLOB_RECURSE SOURCES "src/*.cpp")
@@ -22,7 +22,7 @@ if(NOT EIGEN3_INCLUDE_DIR)
 endif()
 include_directories(${EIGEN3_INCLUDE_DIR})
 
-# Get the GLFW environment variable. There should be a CMakeLists.txt in the 
+# Get the GLFW environment variable. There should be a CMakeLists.txt in the
 # specified directory.
 set(GLFW_DIR "$ENV{GLFW_DIR}")
 if(NOT GLFW_DIR)

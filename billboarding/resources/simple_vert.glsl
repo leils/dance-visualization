@@ -15,6 +15,7 @@ uniform vec3 MatAmb;
 uniform vec3 MatDif;
 uniform vec3 MatSpec;
 uniform float shine;
+uniform bool knee;
 
 uniform int light_x;
 
