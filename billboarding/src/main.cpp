@@ -438,7 +438,6 @@ static const GLfloat knee_buffer[] = {
     -3.07592773438,-1.82608276367,5.26056945801
 
 };
-
 GLuint KneeArrayID;
 static GLfloat g_vertex_knee_buffer[NUM_COORDS * NUM_MULT];
 GLuint knee_vertexbuffer;
@@ -847,7 +846,6 @@ static GLfloat ankle_buffer[] = {
     -2.90687774658,-1.99331207275,8.62669799805,
     -3.03827697754,-1.95392425537,8.60815246582
 };
-
 GLuint AnkleArrayID;
 // Array to fill with the converted vertices
 static GLfloat g_vertex_ankle_buffer[NUM_COORDS * NUM_MULT];
@@ -966,49 +964,49 @@ static void printNewVertices() {
   printf("done printing\n");
 }
 
-static void convertVertices() {
+static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
   GLfloat ax, ay, az, prime_ay, bx, by, bz, prime_by;
   int j = 0;
   int i;
   for (i = 0; i < NUM_COORDS - 3; i = i + 3) {
-    ax = ankle_buffer[i];
-    ay = ankle_buffer[i + 1];
-    az = ankle_buffer[i + 2];
-    bx = ankle_buffer[i + 3];
-    by = ankle_buffer[i + 4];
-    bz = ankle_buffer[i + 5];
+    ax = in_buffer[i];
+    ay = in_buffer[i + 1];
+    az = in_buffer[i + 2];
+    bx = in_buffer[i + 3];
+    by = in_buffer[i + 4];
+    bz = in_buffer[i + 5];
     prime_ay = ay - .5;
     prime_by = by - .5;
 
     // Push A
-    g_vertex_ankle_buffer[j++] = ax;
-    g_vertex_ankle_buffer[j++] = ay;
-    g_vertex_ankle_buffer[j++] = az;
+    out_buffer[j++] = ax;
+    out_buffer[j++] = ay;
+    out_buffer[j++] = az;
 
     // Push A'
-    g_vertex_ankle_buffer[j++] = ax;
-    g_vertex_ankle_buffer[j++] = prime_ay;
-    g_vertex_ankle_buffer[j++] = az;
+    out_buffer[j++] = ax;
+    out_buffer[j++] = prime_ay;
+    out_buffer[j++] = az;
 
     // Push B
-    g_vertex_ankle_buffer[j++] = bx;
-    g_vertex_ankle_buffer[j++] = by;
-    g_vertex_ankle_buffer[j++] = bz;
+    out_buffer[j++] = bx;
+    out_buffer[j++] = by;
+    out_buffer[j++] = bz;
 
     // Push B
-    g_vertex_ankle_buffer[j++] = bx;
-    g_vertex_ankle_buffer[j++] = by;
-    g_vertex_ankle_buffer[j++] = bz;
+    out_buffer[j++] = bx;
+    out_buffer[j++] = by;
+    out_buffer[j++] = bz;
 
     // Push A'
-    g_vertex_ankle_buffer[j++] = ax;
-    g_vertex_ankle_buffer[j++] = prime_ay;
-    g_vertex_ankle_buffer[j++] = az;
+    out_buffer[j++] = ax;
+    out_buffer[j++] = prime_ay;
+    out_buffer[j++] = az;
 
     // Push B'
-    g_vertex_ankle_buffer[j++] = bx;
-    g_vertex_ankle_buffer[j++] = prime_by;
-    g_vertex_ankle_buffer[j++] = bz;
+    out_buffer[j++] = bx;
+    out_buffer[j++] = prime_by;
+    out_buffer[j++] = bz;
 
   }
   // printf("Converted vertices, i = %d\n", i);
@@ -1030,9 +1028,9 @@ static void initGeom() {
       I shouldn't even need dynamic: we know the fixed size.
       */
 
-  printVertices();
-  convertVertices();
-  printNewVertices();
+  // printVertices();
+  convertVertices(ankle_buffer, g_vertex_ankle_buffer);
+  // printNewVertices();
 
   glGenBuffers(1, &ankle_vertexbuffer);
   //set the current state to focus on our vertex buffer
