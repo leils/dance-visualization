@@ -12,7 +12,7 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #include "shape.h"
 
 #define NUM_COORDS (401 * 3)
-#define NUM_MULT 6
+#define NUM_MULT 6 // Each coordinate generates 5 other coordinates
 
 
 using namespace std;
@@ -1073,7 +1073,7 @@ static void render()
   glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
   //draw the triangles
   //set up pulling of vertices
-  int num_to_draw = t * 3;
+  int num_to_draw = t * 9;
   cout << num_to_draw << endl;
 
   glEnableVertexAttribArray(0);
