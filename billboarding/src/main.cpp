@@ -14,17 +14,6 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #define NUM_COORDS (401 * 3)
 #define NUM_MULT 6
 
-/* Should I be using shapes?
-   Like ... we've only ever imported shapes from files.
-   The "shape" is there to interpret the mesh.
-   What about what I have now? I just want to draw 4 vectors.
-   And I need to do calculations on them.
-
-   Do I know how to do the projection & perspective matrices
-   on pure vector lists?
-
-   Lab4 would have non-shape rendering.
-   */
 
 using namespace std;
 using namespace Eigen;
@@ -1079,33 +1068,36 @@ static void render()
   M->loadIdentity();
 
   M->translate(Vector3f(0, 0, -20));
-  M->rotate(1, Vector3f(0, 1, 0)); //NOT ACTUALLY DOING ANYTHING
+  M->rotate(90, Vector3f(1, 0, 0)); // OLDER ROTATE IS IN DEGREES
   glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
   //draw the triangles
   //set up pulling of vertices
+  int num_to_draw = t * 9;
+
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-  glDrawArrays(GL_TRIANGLES, 0, NUM_COORDS * NUM_MULT);
+  // glDrawArrays(GL_TRIANGLES, 0, NUM_COORDS * NUM_MULT); // TODO: adding a time based amt here
+  glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
   glDisableVertexAttribArray(0);
 
   glUniform1i(prog->getUniform("knee"), true);
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-  glDrawArrays(GL_TRIANGLES, 0, NUM_COORDS * NUM_MULT);
+  // glDrawArrays(GL_TRIANGLES, 0, NUM_COORDS * NUM_MULT);
+  glDrawArrays(GL_TRIANGLES, 0, num_to_draw);
   glDisableVertexAttribArray(0);
 
   // Pop matrix stacks.
   M->popMatrix();
   P->popMatrix();
-  // V->popMatrix();
 
   prog->unbind();
-
-  if (sTheta > -70) {
-    sTheta -= 0.5;
-  }
+  //
+  // if (sTheta > -70) {
+  //   sTheta -= 0.5;
+  // }
   t++;
 }
 

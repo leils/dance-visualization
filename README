@@ -1,6 +1,8 @@
 Senior Project: Leia Chang
 
 TODO:
-- Refactor for better IO (3) 
-- Render based on time (2)
-- Rotate 90 degrees on the X axis (1)
+- Refactor for better IO
+    - TinyObjLoader for csv? 
+- Render based on time
+- Shading
+- Add mousetracking from 471 lab01
