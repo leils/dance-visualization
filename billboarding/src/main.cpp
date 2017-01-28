@@ -844,7 +844,7 @@ int g_width, g_height;
 float sTheta;
 // TODO (leia): remove
 int gMat = 0;
-int t = 0;
+int t;
 
 // Eye vectors for viewpoint moving
 Vector3f eye = Vector3f();
@@ -1007,6 +1007,7 @@ static void initGeom() {
 static void init()
 {
   GLSL::checkVersion();
+  t = 0;
 
   sTheta = 0;
   // Set background color.
@@ -1072,7 +1073,8 @@ static void render()
   glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
   //draw the triangles
   //set up pulling of vertices
-  int num_to_draw = t * 9;
+  int num_to_draw = t * 3;
+  cout << num_to_draw << endl;
 
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
