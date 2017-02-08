@@ -906,31 +906,11 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
   }
 }
 
-static void mouse_track(GLFWwindow *window) {
-  /* Removed viewpoint mechanics here */
-}
-
 
 static void resize_callback(GLFWwindow *window, int width, int height) {
   g_width = width;
   g_height = height;
   glViewport(0, 0, width, height);
-}
-
-
-static void printVertices() {
-  printf("Original vertices: \n");
-  for (int i = 0; i < NUM_COORDS; i++) {
-    printf("OG_VERTEX: %f\n", (float)(ankle_buffer[i]));
-  }
-}
-
-static void printNewVertices() {
-  printf("New vertices: \n");
-  for (int i = 0; i < NUM_COORDS * NUM_MULT; i++) {
-    printf("i = %d: %f\n", i, (float)(g_vertex_ankle_buffer[i]));
-  }
-  printf("done printing\n");
 }
 
 static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
@@ -1074,12 +1054,10 @@ static void render()
   //draw the triangles
   //set up pulling of vertices
   int num_to_draw = t * 9;
-  cout << num_to_draw << endl;
 
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-  // glDrawArrays(GL_TRIANGLES, 0, NUM_COORDS * NUM_MULT); // TODO: adding a time based amt here
   glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
   glDisableVertexAttribArray(0);
 
@@ -1096,10 +1074,6 @@ static void render()
   P->popMatrix();
 
   prog->unbind();
-  //
-  // if (sTheta > -70) {
-  //   sTheta -= 0.5;
-  // }
   t++;
 }
 
