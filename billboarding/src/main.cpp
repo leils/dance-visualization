@@ -14,7 +14,6 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #define NUM_COORDS (401 * 3) // Number of coordinates in each section of the swing dancing mocap
 #define NUM_MULT 6 // Each coordinate generates 5 other coordinates
 
-
 using namespace std;
 using namespace Eigen;
 
@@ -841,7 +840,6 @@ static GLfloat g_vertex_ankle_buffer[NUM_COORDS * NUM_MULT];
 GLuint ankle_vertexbuffer;
 
 int g_width, g_height;
-float sTheta;
 // TODO (leia): remove
 int gMat = 0;
 int t;
@@ -988,8 +986,6 @@ static void init()
 {
     GLSL::checkVersion();
     t = 0;
-
-    sTheta = 0;
     // Set background color.
     glClearColor(.12f, .34f, .56f, 1.0f);
     // Enable z-buffer test.
