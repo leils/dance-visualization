@@ -11,7 +11,7 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #include "MatrixStack.h"
 #include "shape.h"
 
-#define NUM_COORDS (401 * 3)
+#define NUM_COORDS (401 * 3) // Number of coordinates in each section of the swing dancing mocap
 #define NUM_MULT 6 // Each coordinate generates 5 other coordinates
 
 
@@ -861,285 +861,286 @@ float theta = -M_PI / 2;
 
 static void error_callback(int error, const char *description)
 {
-  cerr << description << endl;
+    cerr << description << endl;
 }
 
 static void calculate_directions()
 {
-  eye_forward = lookAtPt - eye;
-  if (lock_y) {
-    eye_forward[1] = 0.0;
-  }
-  eye_forward.normalize();
-  eye_right = Vector3f(-eye_forward.z(), eye_forward.y(), eye_forward.x());
-  if (lock_y) {
-    eye_right[1] = 0.0;
-  }
+    eye_forward = lookAtPt - eye;
+    if (lock_y) {
+        eye_forward[1] = 0.0;
+    }
+    eye_forward.normalize();
+    eye_right = Vector3f(-eye_forward.z(), eye_forward.y(), eye_forward.x());
+    if (lock_y) {
+        eye_right[1] = 0.0;
+    }
 }
 
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-    glfwSetWindowShouldClose(window, GL_TRUE);
-  } else if (key == GLFW_KEY_A) {
-    eye -= eye_right / 5; // Move eye left
-  } else if (key == GLFW_KEY_D) {
-    eye += eye_right / 5; // Move eye right
-  } else if (key == GLFW_KEY_W) {
-    eye += eye_forward / 5; // Move eye forward
-  } else if (key == GLFW_KEY_S) {
-    eye -= eye_forward / 5; // Move eye backward
-  } else if (key == GLFW_KEY_L && action == GLFW_PRESS) {
-    lock_view = !lock_view; // lock the viewpoint
-  } else if (key == GLFW_KEY_Y && action == GLFW_PRESS) {
-    lock_y = !lock_y; // lock the eye in the y axis
-  } else if (key == GLFW_KEY_RIGHT) {
-    // theta defines l/r of the view. Positive to the right.
-    theta += .1; // turn eye to the right
-  } else if (key == GLFW_KEY_LEFT) {
-    theta -= .1; // turn the eye to the left
-  } else if (key == GLFW_KEY_UP) {
-    // phi defines u/d of the view. Positive up.
-    phi += .1; // turn the eye upward
-  } else if (key == GLFW_KEY_DOWN) {
-    phi -= .1; // turn the eye downward
-  }
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    } else if (key == GLFW_KEY_A) {
+        eye -= eye_right / 5; // Move eye left
+    } else if (key == GLFW_KEY_D) {
+        eye += eye_right / 5; // Move eye right
+    } else if (key == GLFW_KEY_W) {
+        eye += eye_forward / 5; // Move eye forward
+    } else if (key == GLFW_KEY_S) {
+        eye -= eye_forward / 5; // Move eye backward
+    } else if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+        lock_view = !lock_view; // lock the viewpoint
+    } else if (key == GLFW_KEY_Y && action == GLFW_PRESS) {
+        lock_y = !lock_y; // lock the eye in the y axis
+    } else if (key == GLFW_KEY_RIGHT) {
+        // theta defines l/r of the view. Positive to the right.
+        theta += .1; // turn eye to the right
+    } else if (key == GLFW_KEY_LEFT) {
+        theta -= .1; // turn the eye to the left
+    } else if (key == GLFW_KEY_UP) {
+        // phi defines u/d of the view. Positive up.
+        phi += .1; // turn the eye upward
+    } else if (key == GLFW_KEY_DOWN) {
+        phi -= .1; // turn the eye downward
+    }
 }
 
 
 static void resize_callback(GLFWwindow *window, int width, int height) {
-  g_width = width;
-  g_height = height;
-  glViewport(0, 0, width, height);
+    g_width = width;
+    g_height = height;
+    glViewport(0, 0, width, height);
 }
 
 static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
-  GLfloat ax, ay, az, prime_ay, bx, by, bz, prime_by;
-  int j = 0;
-  int i;
-  for (i = 0; i < NUM_COORDS - 3; i = i + 3) {
-    ax = in_buffer[i];
-    ay = in_buffer[i + 1];
-    az = in_buffer[i + 2];
-    bx = in_buffer[i + 3];
-    by = in_buffer[i + 4];
-    bz = in_buffer[i + 5];
-    prime_ay = ay - .5;
-    prime_by = by - .5;
+    GLfloat ax, ay, az, prime_ay, bx, by, bz, prime_by;
+    int j = 0;
+    int i;
+    for (i = 0; i < NUM_COORDS - 3; i = i + 3) {
+        ax = in_buffer[i];
+        ay = in_buffer[i + 1];
+        az = in_buffer[i + 2];
+        bx = in_buffer[i + 3];
+        by = in_buffer[i + 4];
+        bz = in_buffer[i + 5];
+        prime_ay = ay - .5;
+        prime_by = by - .5;
 
-    // Push A
-    out_buffer[j++] = ax;
-    out_buffer[j++] = ay;
-    out_buffer[j++] = az;
+        // Push A
+        out_buffer[j++] = ax;
+        out_buffer[j++] = ay;
+        out_buffer[j++] = az;
 
-    // Push A'
-    out_buffer[j++] = ax;
-    out_buffer[j++] = prime_ay;
-    out_buffer[j++] = az;
+        // Push A'
+        out_buffer[j++] = ax;
+        out_buffer[j++] = prime_ay;
+        out_buffer[j++] = az;
 
-    // Push B
-    out_buffer[j++] = bx;
-    out_buffer[j++] = by;
-    out_buffer[j++] = bz;
+        // Push B
+        out_buffer[j++] = bx;
+        out_buffer[j++] = by;
+        out_buffer[j++] = bz;
 
-    // Push B
-    out_buffer[j++] = bx;
-    out_buffer[j++] = by;
-    out_buffer[j++] = bz;
+        // Push B
+        out_buffer[j++] = bx;
+        out_buffer[j++] = by;
+        out_buffer[j++] = bz;
 
-    // Push A'
-    out_buffer[j++] = ax;
-    out_buffer[j++] = prime_ay;
-    out_buffer[j++] = az;
+        // Push A'
+        out_buffer[j++] = ax;
+        out_buffer[j++] = prime_ay;
+        out_buffer[j++] = az;
 
-    // Push B'
-    out_buffer[j++] = bx;
-    out_buffer[j++] = prime_by;
-    out_buffer[j++] = bz;
+        // Push B'
+        out_buffer[j++] = bx;
+        out_buffer[j++] = prime_by;
+        out_buffer[j++] = bz;
 
-  }
-  // printf("Converted vertices, i = %d\n", i);
+    }
+    // printf("Converted vertices, i = %d\n", i);
 }
 
 static void initGeom() {
-  //generate the VAO
-  glGenVertexArrays(1, &AnkleArrayID);
-  glBindVertexArray(AnkleArrayID);
+    //generate the VAO
+    glGenVertexArrays(1, &AnkleArrayID);
+    glBindVertexArray(AnkleArrayID);
 
-  glGenVertexArrays(2, &KneeArrayID);
-  glBindVertexArray(KneeArrayID);
+    glGenVertexArrays(2, &KneeArrayID);
+    glBindVertexArray(KneeArrayID);
 
-  //generate vertex buffer to hand off to OGL
-  convertVertices(ankle_buffer, g_vertex_ankle_buffer);
-  convertVertices(knee_buffer, g_vertex_knee_buffer);
+    //generate vertex buffer to hand off to OGL
+    convertVertices(ankle_buffer, g_vertex_ankle_buffer);
+    convertVertices(knee_buffer, g_vertex_knee_buffer);
 
-  glGenBuffers(1, &ankle_vertexbuffer);
-  //set the current state to focus on our vertex buffer
-  glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
-  //actually memcopy the data - only do this once
-  glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_ankle_buffer), g_vertex_ankle_buffer, GL_DYNAMIC_DRAW);
+    glGenBuffers(1, &ankle_vertexbuffer);
+    //set the current state to focus on our vertex buffer
+    glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
+    //actually memcopy the data - only do this once
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_ankle_buffer), g_vertex_ankle_buffer, GL_DYNAMIC_DRAW);
 
-  glGenBuffers(2, &knee_vertexbuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_knee_buffer), g_vertex_knee_buffer, GL_DYNAMIC_DRAW);
+    glGenBuffers(2, &knee_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_knee_buffer), g_vertex_knee_buffer, GL_DYNAMIC_DRAW);
 }
 
 static void init()
 {
-  GLSL::checkVersion();
-  t = 0;
+    GLSL::checkVersion();
+    t = 0;
 
-  sTheta = 0;
-  // Set background color.
-  glClearColor(.12f, .34f, .56f, 1.0f);
-  // Enable z-buffer test.
-  glEnable(GL_DEPTH_TEST);
+    sTheta = 0;
+    // Set background color.
+    glClearColor(.12f, .34f, .56f, 1.0f);
+    // Enable z-buffer test.
+    glEnable(GL_DEPTH_TEST);
 
-  initGeom();
+    initGeom();
 
-  // Initialize the GLSL program.
-  prog = make_shared<Program>();
-  prog->setVerbose(true);
-  prog->setShaderNames(RESOURCE_DIR + "simple_vert.glsl", RESOURCE_DIR + "simple_frag.glsl");
-  prog->init();
-  prog->addUniform("P");
-  prog->addUniform("M");
-  prog->addUniform("V");
+    // Initialize the GLSL program.
+    prog = make_shared<Program>();
+    prog->setVerbose(true);
+    prog->setShaderNames(RESOURCE_DIR + "simple_vert.glsl", RESOURCE_DIR + "simple_frag.glsl");
+    prog->init();
+    prog->addUniform("P");
+    prog->addUniform("M");
+    prog->addUniform("V");
 
-  /* TODO(leia): Eventually just take this out */
-  prog->addAttribute("vertPos");
-  prog->addAttribute("vertNor");
-  prog->addUniform("knee");
+    /* TODO(leia): Eventually just take this out */
+    prog->addAttribute("vertPos");
+    prog->addAttribute("vertNor");
+    prog->addUniform("knee");
 }
 
 static void render()
 {
-  // Get current frame buffer size.
-  int width, height;
-  glfwGetFramebufferSize(window, &width, &height);
-  glViewport(0, 0, width, height);
+    // Get current frame buffer size.
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    glViewport(0, 0, width, height);
 
-  // Clear framebuffer.
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Clear framebuffer.
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  float aspect = width / (float)height;
+    float aspect = width / (float)height;
 
-  // Create the matrix stacks
-  auto P = make_shared<MatrixStack>();
-  auto M = make_shared<MatrixStack>();
-  auto V = make_shared<MatrixStack>();
+    // Create the matrix stacks
+    auto P = make_shared<MatrixStack>();
+    auto M = make_shared<MatrixStack>();
+    auto V = make_shared<MatrixStack>();
 
-  // Apply perspective projection.
-  P->pushMatrix();
-  P->perspective(45.0f, aspect, 0.01f, 100.0f);
+    // Apply perspective projection.
+    P->pushMatrix();
+    P->perspective(45.0f, aspect, 0.01f, 100.0f);
 
-  // bind this program, start drawing perspective
-  prog->bind();
-  glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
-  glUniform1i(prog->getUniform("knee"), false);
+    // bind this program, start drawing perspective
+    prog->bind();
+    glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
+    glUniform1i(prog->getUniform("knee"), false);
 
-  // mouse_track(window);
-  lookAtPt = Vector3f(cos(phi) * cos (theta), sin(phi), cos(phi) * cos((M_PI / 2) - theta)) + eye;
-  calculate_directions();
+    // mouse_track(window);
+    lookAtPt = Vector3f(cos(phi) * cos (theta), sin(phi), cos(phi) * cos((M_PI / 2) - theta)) + eye;
+    calculate_directions();
 
-  V->lookAt(eye, lookAtPt, up);
-  glUniformMatrix4fv(prog->getUniform("V"), 1, GL_FALSE, V->topMatrix().data());
+    V->lookAt(eye, lookAtPt, up);
+    glUniformMatrix4fv(prog->getUniform("V"), 1, GL_FALSE, V->topMatrix().data());
 
-  M->pushMatrix();
-  M->loadIdentity();
+    M->pushMatrix();
+    M->loadIdentity();
 
-  M->translate(Vector3f(0, 0, -20));
-  M->rotate(90, Vector3f(1, 0, 0)); // OLDER ROTATE IS IN DEGREES
-  glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
-  //draw the triangles
-  //set up pulling of vertices
-  int num_to_draw = t * 9;
+    M->translate(Vector3f(0, 0, -20));
+    M->rotate(90, Vector3f(1, 0, 0));
+        glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
+        //set up pulling of vertices
+        int num_to_draw = t * 9;
 
-  glEnableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-  glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
-  glDisableVertexAttribArray(0);
+        //Draw ankle
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
+        glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
+        glDisableVertexAttribArray(0);
 
-  glUniform1i(prog->getUniform("knee"), true);
-  glEnableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-  // glDrawArrays(GL_TRIANGLES, 0, NUM_COORDS * NUM_MULT);
-  glDrawArrays(GL_TRIANGLES, 0, num_to_draw);
-  glDisableVertexAttribArray(0);
+        //Draw knee
+        glUniform1i(prog->getUniform("knee"), true);
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+        // glDrawArrays(GL_TRIANGLES, 0, NUM_COORDS * NUM_MULT);
+        glDrawArrays(GL_TRIANGLES, 0, num_to_draw);
+        glDisableVertexAttribArray(0);
 
-  // Pop matrix stacks.
-  M->popMatrix();
-  P->popMatrix();
+    // Pop matrix stacks.
+    M->popMatrix();
+    P->popMatrix();
 
-  prog->unbind();
-  t++;
+    prog->unbind();
+    t++;
 }
 
 int main(int argc, char **argv)
 {
-  if (argc < 2) {
-    cout << "Please specify the resource directory." << endl;
-    return 0;
-  }
-  RESOURCE_DIR = argv[1] + string("/");
+    if (argc < 2) {
+        cout << "Please specify the resource directory." << endl;
+        return 0;
+    }
+    RESOURCE_DIR = argv[1] + string("/");
 
-  // Set error callback.
-  glfwSetErrorCallback(error_callback);
-  // Initialize the library.
-  if (!glfwInit()) {
-    return -1;
-  }
-  //request the highest possible version of OGL - important for mac
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    // Set error callback.
+    glfwSetErrorCallback(error_callback);
+    // Initialize the library.
+    if (!glfwInit()) {
+        return -1;
+    }
+    //request the highest possible version of OGL - important for mac
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 
-  // Create a windowed mode window and its OpenGL context.
-  g_width = 640;
-  g_height = 480;
-  window = glfwCreateWindow(640, 480, "Draw The Thing", NULL, NULL);
-  if (!window) {
+    // Create a windowed mode window and its OpenGL context.
+    g_width = 640;
+    g_height = 480;
+    window = glfwCreateWindow(640, 480, "Draw The Thing", NULL, NULL);
+    if (!window) {
+        glfwTerminate();
+        return -1;
+    }
+    // Make the window's context current.
+    glfwMakeContextCurrent(window);
+    // Initialize GLEW.
+    glewExperimental = true;
+    if (glewInit() != GLEW_OK) {
+        cerr << "Failed to initialize GLEW" << endl;
+        return -1;
+    }
+    //weird bootstrap of glGetError
+    glGetError();
+    cout << "OpenGL version: " << glGetString(GL_VERSION) << endl;
+    cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
+
+    // Set vsync.
+    glfwSwapInterval(1);
+    // Set keyboard callback.
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //set the window resize call back
+    glfwSetFramebufferSizeCallback(window, resize_callback);
+
+    // Initialize scene. Note that geometry initialized in init now
+    init();
+
+    // Loop until the user closes the window.
+    while (!glfwWindowShouldClose(window)) {
+        // Render scene.
+        render();
+        // Swap front and back buffers.
+        glfwSwapBuffers(window);
+        // Poll for and process events.
+        glfwPollEvents();
+    }
+    // Quit program.
+    glfwDestroyWindow(window);
     glfwTerminate();
-    return -1;
-  }
-  // Make the window's context current.
-  glfwMakeContextCurrent(window);
-  // Initialize GLEW.
-  glewExperimental = true;
-  if (glewInit() != GLEW_OK) {
-    cerr << "Failed to initialize GLEW" << endl;
-    return -1;
-  }
-  //weird bootstrap of glGetError
-  glGetError();
-  cout << "OpenGL version: " << glGetString(GL_VERSION) << endl;
-  cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
-
-  // Set vsync.
-  glfwSwapInterval(1);
-  // Set keyboard callback.
-  glfwSetKeyCallback(window, key_callback);
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-  //set the window resize call back
-  glfwSetFramebufferSizeCallback(window, resize_callback);
-
-  // Initialize scene. Note that geometry initialized in init now
-  init();
-
-  // Loop until the user closes the window.
-  while (!glfwWindowShouldClose(window)) {
-    // Render scene.
-    render();
-    // Swap front and back buffers.
-    glfwSwapBuffers(window);
-    // Poll for and process events.
-    glfwPollEvents();
-  }
-  // Quit program.
-  glfwDestroyWindow(window);
-  glfwTerminate();
-  return 0;
+    return 0;
 }
