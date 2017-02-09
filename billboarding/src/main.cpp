@@ -15,6 +15,7 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 
 #define NUM_COORDS (401 * 3) // Number of coordinates in each section of the swing dancing mocap
 #define NUM_MULT 6 // Each coordinate generates 5 other coordinates
+#define TIMESTEP .05
 
 using namespace std;
 using namespace Eigen;
@@ -885,16 +886,16 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
         glfwSetWindowShouldClose(window, GL_TRUE);
     } else if (key == GLFW_KEY_A) {
         eye -= eye_right / 5; // Move eye left
+        cam->moveRight(-1, TIMESTEP);
     } else if (key == GLFW_KEY_D) {
         eye += eye_right / 5; // Move eye right
+        cam->moveRight(1, TIMESTEP);
     } else if (key == GLFW_KEY_W) {
         eye += eye_forward / 5; // Move eye forward
+        cam->moveFwd(1, TIMESTEP);
     } else if (key == GLFW_KEY_S) {
         eye -= eye_forward / 5; // Move eye backward
-    } else if (key == GLFW_KEY_L && action == GLFW_PRESS) {
-        lock_view = !lock_view; // lock the viewpoint
-    } else if (key == GLFW_KEY_Y && action == GLFW_PRESS) {
-        lock_y = !lock_y; // lock the eye in the y axis
+        cam->moveFwd(-1, TIMESTEP);
     } else if (key == GLFW_KEY_RIGHT) {
         // theta defines l/r of the view. Positive to the right.
         theta += .1; // turn eye to the right
@@ -1010,6 +1011,8 @@ static void init()
     prog->addAttribute("vertPos");
     prog->addAttribute("vertNor");
     prog->addUniform("knee");
+
+    cam->init(window);
 }
 
 static void render()
@@ -1038,11 +1041,16 @@ static void render()
     glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
     glUniform1i(prog->getUniform("knee"), false);
 
+
+    // cam->mouseTracking(window, TIMESTEP);
     // mouse_track(window);
     lookAtPt = Vector3f(cos(phi) * cos (theta), sin(phi), cos(phi) * cos((M_PI / 2) - theta)) + eye;
     calculate_directions();
 
-    V->lookAt(eye, lookAtPt, up);
+    cam->mouseTracking(window, TIMESTEP);
+
+    V->lookAt(cam->getPosition(), cam->getLookatPt(), cam->getUp());
+    // V->lookAt(eye, lookAtPt, up);
     glUniformMatrix4fv(prog->getUniform("V"), 1, GL_FALSE, V->topMatrix().data());
 
     M->pushMatrix();
@@ -1127,6 +1135,7 @@ int main(int argc, char **argv)
     //set the window resize call back
     glfwSetFramebufferSizeCallback(window, resize_callback);
 
+    glfwSetCursorPos(window, g_width/2, g_height/2);
     // Initialize scene. Note that geometry initialized in init now
     init();
 

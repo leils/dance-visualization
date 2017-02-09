@@ -10,7 +10,7 @@ Camera::Camera(Vector3f pos)
     right = Vector3f(1, 0, 0);
     speed = 5.0f; // 1 unit per sec
     lookspeed = 0.05f;
-    horizontal_angle = 3.14f;
+    horizontal_angle = -3.14f;
     vertical_angle = 0.0f;
     lo_clamp = -1.0f;
     hi_clamp = 1.0f;
