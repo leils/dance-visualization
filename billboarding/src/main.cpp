@@ -1047,7 +1047,11 @@ static void render()
     lookAtPt = Vector3f(cos(phi) * cos (theta), sin(phi), cos(phi) * cos((M_PI / 2) - theta)) + eye;
     calculate_directions();
 
-    cam->mouseTracking(window, TIMESTEP);
+    if (t > 100){
+        cam->mouseTracking(window, TIMESTEP);
+    } else {
+        glfwSetCursorPos(window, 320, 240);
+    }
 
     V->lookAt(cam->getPosition(), cam->getLookatPt(), cam->getUp());
     // V->lookAt(eye, lookAtPt, up);

@@ -11,7 +11,7 @@ Camera::Camera(Vector3f pos)
     speed = 5.0f; // 1 unit per sec
     lookspeed = 0.05f;
     horizontal_angle = -3.14f;
-    vertical_angle = 0.0f;
+    vertical_angle = -.5f;
     lo_clamp = -1.0f;
     hi_clamp = 1.0f;
     bound_sphere_radius = 1.0f;
@@ -23,8 +23,6 @@ Camera::~Camera()
 
 void Camera::init(GLFWwindow *window)
 {
-    // TODO(@leia): How do we init such that our starting up vector is +Y?
-    // Is this even really doing anything right now?
     double xpos, ypos;
     glfwSetCursorPos(window, 320, 240);
     glfwGetCursorPos(window, &xpos, &ypos);
@@ -78,13 +76,12 @@ void Camera::calculateDirections()
     up.normalize();
 }
 
-// TODO(@leia): change this to account for time
 void Camera::mouseTracking(GLFWwindow *window, float dt)
 {
     double xpos, ypos;
     int w_width, w_height;
-    glfwGetCursorPos(window, &xpos, &ypos);
     glfwGetWindowSize(window, &w_width, &w_height);
+    glfwGetCursorPos(window, &xpos, &ypos);
 
     cout << "x: " << xpos << " y: " << ypos << endl;
 
