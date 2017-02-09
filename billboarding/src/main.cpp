@@ -1,6 +1,7 @@
 /* P3 materials example - see SetMaterial and fragment shader
 CPE 471 Cal Poly Z. Wood + S. Sueda
 */
+
 #include <iostream>
 #define GLEW_STATIC
 #include <GL/glew.h>
@@ -10,6 +11,7 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #include "Program.h"
 #include "MatrixStack.h"
 #include "shape.h"
+#include "Camera.h"
 
 #define NUM_COORDS (401 * 3) // Number of coordinates in each section of the swing dancing mocap
 #define NUM_MULT 6 // Each coordinate generates 5 other coordinates
@@ -20,6 +22,8 @@ using namespace Eigen;
 GLFWwindow *window; // Main application window
 string RESOURCE_DIR = ""; // Where the resources are loaded from
 shared_ptr<Program> prog;
+
+Camera *cam = new Camera();
 
 static GLfloat knee_buffer[] = {
     0.749688720703,-6.72364624023,4.64307250977,
@@ -1045,7 +1049,7 @@ static void render()
     M->loadIdentity();
 
     M->translate(Vector3f(0, 0, -20));
-    M->rotate(90, Vector3f(1, 0, 0));
+    M->rotate(90, Vector3f(1, 0, 0)); //Rotate by 90 degrees for correct orientation
         glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
         //set up pulling of vertices
         int num_to_draw = t * 9;
