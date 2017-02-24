@@ -7,18 +7,13 @@ uniform mat4 M;
 uniform mat4 V;
 out vec3 fragNor;
 out vec3 fragPos;
-out vec3 Lpt;
-out vec3 light_I;
 out vec3 color_vec;
 
 uniform bool knee;
 
-uniform int light_x;
 
 void main()
 {
-   Lpt = vec3(light_x, 1, 1);
-   light_I = vec3(1, 1, 1);
    fragPos = (vertPos * M).xyz;
 
    gl_Position = P * V * M * vertPos;

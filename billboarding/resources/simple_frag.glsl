@@ -13,7 +13,9 @@ void main()
     if (knee) {
         color = vec4(0, 0, 0, 1);
     } else {
-        color = vec4(1, 0, 0, 1.0);
+       //vec3 normal = normalize(fragNor);
+       color = vec4(1, 0, 0, 1);
+
     }
 
 }

@@ -83,8 +83,6 @@ void Camera::mouseTracking(GLFWwindow *window, float dt)
     glfwGetWindowSize(window, &w_width, &w_height);
     glfwGetCursorPos(window, &xpos, &ypos);
 
-    cout << "x: " << xpos << " y: " << ypos << endl;
-
     horizontal_angle += float(w_width/2 - xpos) * lookspeed * dt;
     vertical_angle += float(w_height/2 - ypos) * lookspeed * dt;
     // Clamp vertical so no rolling is possible
@@ -94,11 +92,7 @@ void Camera::mouseTracking(GLFWwindow *window, float dt)
     if (vertical_angle < lo_clamp) {
         vertical_angle = lo_clamp;
     }
-    // vertical_angle = clamp(vertical_angle, lo_clamp, hi_clamp);
 
-
-    cout << "vert: " << vertical_angle << " hor: " << horizontal_angle << endl;
-    // std::cout << horizontal_angle << " " << vertical_angle << std::endl;
 
     calculateDirections();
     glfwSetCursorPos(window, w_width/2, w_height/2);
