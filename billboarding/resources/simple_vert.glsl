@@ -10,6 +10,7 @@ out vec3 fragPos;
 out vec3 color_vec;
 
 uniform bool knee;
+uniform vec3 lightdir;
 
 
 void main()
