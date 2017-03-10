@@ -10,7 +10,7 @@ uniform vec3 lightDir;
 void main()
 {
     float intensity;
-    // FUCK there's no normal. I need to calculate that now, probably. 
+    // FUCK there's no normal. I need to calculate that now, probably.
 	intensity = dot(lightDir,normalize(fragNor));
 
 
@@ -19,9 +19,9 @@ void main()
     if (knee) {
         color =  black;
     } else {
-       vec3 normal = normalize(fragNor);
-       color = red * intensity;
-       //color = red;
+       //vec3 normal = normalize(fragNor);
+       //color = red * intensity;
+       color = red;
 
     }
 
