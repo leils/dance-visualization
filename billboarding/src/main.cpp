@@ -14,7 +14,7 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #include "Camera.h"
 
 #define NUM_COORDS (401 * 3) // Number of coordinates in each section of the swing dancing mocap
-#define NUM_MULT 6 // Each coordinate generates 5 other coordinates
+#define NUM_MULT 6 // Each coordinate generates 5 other coordinates (vertices of the triangle)
 #define TIMESTEP .05
 
 using namespace std;
@@ -433,6 +433,7 @@ static GLfloat knee_buffer[] = {
 };
 GLuint KneeArrayID;
 static GLfloat g_vertex_knee_buffer[NUM_COORDS * NUM_MULT];
+static GLfloat g_vertex_knee_normal_buffer[NUM_COORDS * NUM_MULT];
 GLuint knee_vertexbuffer;
 
 static GLfloat ankle_buffer[] = {
@@ -842,6 +843,7 @@ static GLfloat ankle_buffer[] = {
 GLuint AnkleArrayID;
 // Array to fill with the converted vertices
 static GLfloat g_vertex_ankle_buffer[NUM_COORDS * NUM_MULT];
+static GLfloat g_vertex_ankle_normal_buffer[NUM_COORDS * NUM_MULT];
 GLuint ankle_vertexbuffer;
 
 int g_width, g_height;
@@ -916,6 +918,49 @@ static void resize_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
+//Stolen from Zoe's shape code
+void normalize_vector(float v[3])
+{
+   float length = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
+   v[0] = v[0] / length;
+   v[1] = v[1] / length;
+   v[2] = v[2] / length;
+}
+
+// Stolen from Zoe's shape code
+void calc_normal(float v[3][3], float out[3])
+{
+   float v1[3],v2[3];
+   static const int x = 0;
+   static const int y = 1;
+   static const int z = 2;
+   // Calculate two vectors from the three points
+   v1[x] = v[0][x] - v[1][x];
+   v1[y] = v[0][y] - v[1][y];
+   v1[z] = v[0][z] - v[1][z];
+   v2[x] = v[1][x] - v[2][x];
+   v2[y] = v[1][y] - v[2][y];
+   v2[z] = v[1][z] - v[2][z];
+   // Take the cross product of the two vectors to get
+   // the normal vector which will be stored in out
+   out[x] = v1[y]*v2[z] - v1[z]*v2[y];
+   out[y] = v1[z]*v2[x] - v1[x]*v2[z];
+   out[z] = v1[x]*v2[y] - v1[y]*v2[x];
+   // Normalize the vector
+   //cout << "before " << out[x] << out[y] << out[z] << endl;
+   normalize_vector(out);
+   //cout << "after " << out[x] << out[y] << out[z] << endl;
+}
+
+
+// TODO: I should also be able to calculate the normals here, because I have all
+// the vertices of the triangles.
+/*
+ * Normals are stored in a normal buffer, 1:1 with the vertices.
+ * That is, each one of the vertices stored here (in the triangles) gets a copy of
+ * the normal for that triangle. So for a given triangle, its normal n will get stored
+ * three times.
+ */
 static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
     GLfloat ax, ay, az, prime_ay, bx, by, bz, prime_by;
     int j = 0;
@@ -930,6 +975,7 @@ static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
         prime_ay = ay - .5;
         prime_by = by - .5;
 
+        // TRIANGLE 1
         // Push A
         out_buffer[j++] = ax;
         out_buffer[j++] = ay;
@@ -945,6 +991,7 @@ static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
         out_buffer[j++] = by;
         out_buffer[j++] = bz;
 
+        // TRIANGLE 2
         // Push B
         out_buffer[j++] = bx;
         out_buffer[j++] = by;
