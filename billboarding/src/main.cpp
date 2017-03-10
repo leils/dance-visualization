@@ -952,6 +952,46 @@ void calc_normal(float v[3][3], float out[3])
    //cout << "after " << out[x] << out[y] << out[z] << endl;
 }
 
+void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
+{
+    int idx1, idx2, idx3;
+    float v[3][3];
+    float norm[3];
+
+    for (int i = 0; i < (NUM_COORDS * NUM_MULT)/3; i++) {
+        //All the vertices should be in order in the first place ...
+        idx1 = i + 0;
+        idx2 = i + 2;
+        idx3 = i + 3;
+
+        v[0][0] = vert_buffer[3*idx1+0];
+        v[0][1] = vert_buffer[3*idx1+1];
+        v[0][2] = vert_buffer[3*idx1+2];
+
+        v[1][0]= vert_buffer[3*idx2+0];
+        v[1][1]= vert_buffer[3*idx2+1];
+        v[1][2]= vert_buffer[3*idx2+2];
+
+        v[2][0]= vert_buffer[3*idx3+0];
+        v[2][1]= vert_buffer[3*idx3+1];
+        v[2][2]= vert_buffer[3*idx3+2];
+
+        calc_normal(v, norm);
+
+        norm_buffer[3*idx1+0] += norm[0];
+        norm_buffer[3*idx2+0] += norm[0];
+        norm_buffer[3*idx3+0] += norm[0];
+
+        norm_buffer[3*idx1+1] += norm[1];
+        norm_buffer[3*idx2+1] += norm[1];
+        norm_buffer[3*idx3+1] += norm[1];
+
+        norm_buffer[3*idx1+2] += norm[2];
+        norm_buffer[3*idx2+2] += norm[2];
+        norm_buffer[3*idx3+2] += norm[2];
+    }
+}
+
 
 // TODO: I should also be able to calculate the normals here, because I have all
 // the vertices of the triangles.
@@ -1022,6 +1062,7 @@ static void initGeom() {
     //generate vertex buffer to hand off to OGL
     convertVertices(ankle_buffer, g_vertex_ankle_buffer);
     convertVertices(knee_buffer, g_vertex_knee_buffer);
+    compute_normals(g_vertex_ankle_buffer, g_vertex_ankle_normal_buffer);
 
     glGenBuffers(1, &ankle_vertexbuffer);
     //set the current state to focus on our vertex buffer
