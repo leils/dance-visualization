@@ -11,7 +11,7 @@ void main()
 {
     float intensity;
     // FUCK there's no normal. I need to calculate that now, probably.
-	intensity = dot(lightDir,normalize(fragNor));
+	//intensity = dot(lightDir,normalize(fragNor));
 
 
     vec4 red = vec4(1,0,0,1);

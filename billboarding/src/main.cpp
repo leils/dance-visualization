@@ -950,9 +950,9 @@ void calc_normal(float v[3][3], float out[3])
    out[y] = v1[z]*v2[x] - v1[x]*v2[z];
    out[z] = v1[x]*v2[y] - v1[y]*v2[x];
    // Normalize the vector
-   cout << "before " << out[x] << out[y] << out[z] << endl;
+   // cout << "before " << out[x] << out[y] << out[z] << endl;
    normalize_vector(out);
-   cout << "after " << out[x] << out[y] << out[z] << endl;
+   // cout << "after " << out[x] << out[y] << out[z] << endl;
 }
 
 void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
@@ -1196,10 +1196,10 @@ static void render()
         glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
         //ankle normals
-        // h_nor = prog->getAttribute("vertNor");
-        // glEnableVertexAttribArray(h_nor);
-        // glBindBuffer(GL_ARRAY_BUFFER, AnkleNormalID);
-        // glVertexAttribPointer(h_nor, 3, GL_FLAT, GL_FALSE, 0, (const void *)0);
+        h_nor = prog->getAttribute("vertNor");
+        glEnableVertexAttribArray(h_nor);
+        glBindBuffer(GL_ARRAY_BUFFER, AnkleNormalID);
+        glVertexAttribPointer(h_nor, 3, GL_FLAT, GL_FALSE, 0, (const void *)0);
 
         glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
         glDisableVertexAttribArray(h_pos);
