@@ -432,6 +432,7 @@ static GLfloat knee_buffer[] = {
 
 };
 GLuint KneeArrayID;
+GLuint KneeNormalID;
 static GLfloat g_vertex_knee_buffer[NUM_COORDS * NUM_MULT];
 static GLfloat g_vertex_knee_normal_buffer[NUM_COORDS * NUM_MULT];
 GLuint knee_vertexbuffer;
@@ -841,6 +842,7 @@ static GLfloat ankle_buffer[] = {
     -3.03827697754,-1.95392425537,8.60815246582
 };
 GLuint AnkleArrayID;
+GLuint AnkleNormalID;
 // Array to fill with the converted vertices
 static GLfloat g_vertex_ankle_buffer[NUM_COORDS * NUM_MULT];
 static GLfloat g_vertex_ankle_normal_buffer[NUM_COORDS * NUM_MULT];
@@ -1052,27 +1054,46 @@ static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
 }
 
 static void initGeom() {
-    //generate the VAO
-    glGenVertexArrays(1, &AnkleArrayID);
-    glBindVertexArray(AnkleArrayID);
-
-    glGenVertexArrays(2, &KneeArrayID);
-    glBindVertexArray(KneeArrayID);
-
     //generate vertex buffer to hand off to OGL
     convertVertices(ankle_buffer, g_vertex_ankle_buffer);
     convertVertices(knee_buffer, g_vertex_knee_buffer);
     compute_normals(g_vertex_ankle_buffer, g_vertex_ankle_normal_buffer);
+    compute_normals(g_vertex_knee_buffer, g_vertex_knee_normal_buffer);
 
+    /* -------------------ANKLE----------------- */
+    //generate the VAO
+    glGenVertexArrays(1, &AnkleArrayID);
+    glBindVertexArray(AnkleArrayID);
+
+    // Ankle Vertex Buffer
     glGenBuffers(1, &ankle_vertexbuffer);
     //set the current state to focus on our vertex buffer
     glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
     //actually memcopy the data - only do this once
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_ankle_buffer), g_vertex_ankle_buffer, GL_DYNAMIC_DRAW);
 
+    // Ankle Normal Buffer
+    glGenBuffers(1, &AnkleNormalID);
+    glBindBuffer(GL_ARRAY_BUFFER, AnkleNormalID);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_ankle_normal_buffer), g_vertex_ankle_normal_buffer, GL_STATIC_DRAW);
+
+    //clear
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    /* ------------------- KNEE ------------------------*/
+    glGenVertexArrays(2, &KneeArrayID);
+    glBindVertexArray(KneeArrayID);
+
     glGenBuffers(2, &knee_vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_knee_buffer), g_vertex_knee_buffer, GL_DYNAMIC_DRAW);
+
+    glGenBuffers(1, &KneeNormalID);
+    glBindBuffer(GL_ARRAY_BUFFER, KneeNormalID);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_knee_normal_buffer), g_vertex_knee_normal_buffer, GL_STATIC_DRAW);
+
+    //clear
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 static void init()
@@ -1155,22 +1176,45 @@ static void render()
         glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
         //set up pulling of vertices
         int num_to_draw = t * 9;
+        int h_pos, h_nor;
+        h_pos = h_nor = -1;
 
-        //Draw ankle
-        glEnableVertexAttribArray(0);
+        /*-------------------------Draw ankle--------------------*/
+        glBindVertexArray(AnkleArrayID);
+
+        h_pos = prog->getAttribute("vertPos");
+        glEnableVertexAttribArray(h_pos);
         glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-        glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
-        glDisableVertexAttribArray(0);
+        glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
-        //Draw knee
+        //ankle normals
+        // h_nor = prog->getAttribute("vertNor");
+        // glEnableVertexAttribArray(h_nor);
+        // glBindBuffer(GL_ARRAY_BUFFER, AnkleNormalID);
+        // glVertexAttribPointer(h_nor, 3, GL_FLAT, GL_FALSE, 0, (const void *)0);
+
+        glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
+        glDisableVertexAttribArray(h_pos);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        /*--------------------------Draw knee---------------------*/
+        glBindVertexArray(KneeArrayID);
+
+        h_pos = prog->getAttribute("vertPos");
         glUniform1i(prog->getUniform("knee"), true);
-        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(h_pos);
         glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-        // glDrawArrays(GL_TRIANGLES, 0, NUM_COORDS * NUM_MULT);
+        glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+
+        //kneenormals
+        // h_nor = prog->getAttribute("vertNor");
+        // glEnableVertexAttribArray(h_nor);
+        // glBindBuffer(GL_ARRAY_BUFFER, KneeNormalID);
+        // glVertexAttribPointer(h_nor, 3, GL_FLAT, GL_FALSE, 0, (const void *)0);
+
         glDrawArrays(GL_TRIANGLES, 0, num_to_draw);
-        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(h_pos);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // Pop matrix stacks.
     M->popMatrix();
