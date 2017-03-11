@@ -924,6 +924,7 @@ static void resize_callback(GLFWwindow *window, int width, int height) {
 void normalize_vector(float v[3])
 {
    float length = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
+   // cout << "length: " << length << endl;
    v[0] = v[0] / length;
    v[1] = v[1] / length;
    v[2] = v[2] / length;
@@ -949,9 +950,9 @@ void calc_normal(float v[3][3], float out[3])
    out[y] = v1[z]*v2[x] - v1[x]*v2[z];
    out[z] = v1[x]*v2[y] - v1[y]*v2[x];
    // Normalize the vector
-   //cout << "before " << out[x] << out[y] << out[z] << endl;
+   cout << "before " << out[x] << out[y] << out[z] << endl;
    normalize_vector(out);
-   //cout << "after " << out[x] << out[y] << out[z] << endl;
+   cout << "after " << out[x] << out[y] << out[z] << endl;
 }
 
 void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
@@ -960,37 +961,44 @@ void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
     float v[3][3];
     float norm[3];
 
+    // cout << "full length: " << NUM_MULT * NUM_COORDS << endl;
+
     for (int i = 0; i < (NUM_COORDS * NUM_MULT)/3; i++) {
         //All the vertices should be in order in the first place ...
-        idx1 = i + 0;
-        idx2 = i + 2;
-        idx3 = i + 3;
+        idx1 = (3 * i) + 0;
+        idx2 = (3 * i) + 1;
+        idx3 = (3 * i) + 2;
 
-        v[0][0] = vert_buffer[3*idx1+0];
-        v[0][1] = vert_buffer[3*idx1+1];
-        v[0][2] = vert_buffer[3*idx1+2];
+        // printf("Indices: %d, %d, %d\n", idx1, idx2, idx3);
 
-        v[1][0]= vert_buffer[3*idx2+0];
-        v[1][1]= vert_buffer[3*idx2+1];
-        v[1][2]= vert_buffer[3*idx2+2];
+        //The below should be all of the vertices for 1 triangle
+        v[0][0] = vert_buffer[idx1+0];
+        v[0][1] = vert_buffer[idx1+1];
+        v[0][2] = vert_buffer[idx1+2];
 
-        v[2][0]= vert_buffer[3*idx3+0];
-        v[2][1]= vert_buffer[3*idx3+1];
-        v[2][2]= vert_buffer[3*idx3+2];
+        v[1][0]= vert_buffer[idx2+0];
+        v[1][1]= vert_buffer[idx2+1];
+        v[1][2]= vert_buffer[idx2+2];
+
+        v[2][0]= vert_buffer[idx3+0];
+        v[2][1]= vert_buffer[idx3+1];
+        v[2][2]= vert_buffer[idx3+2];
+
+        // printf("Vertices: (%f, %f, %f)\n", v[0][0], v[0][1], v[0][2]);
 
         calc_normal(v, norm);
 
-        norm_buffer[3*idx1+0] += norm[0];
-        norm_buffer[3*idx2+0] += norm[0];
-        norm_buffer[3*idx3+0] += norm[0];
+        norm_buffer[idx1+0] += norm[0];
+        norm_buffer[idx2+0] += norm[0];
+        norm_buffer[idx3+0] += norm[0];
 
-        norm_buffer[3*idx1+1] += norm[1];
-        norm_buffer[3*idx2+1] += norm[1];
-        norm_buffer[3*idx3+1] += norm[1];
+        norm_buffer[idx1+1] += norm[1];
+        norm_buffer[idx2+1] += norm[1];
+        norm_buffer[idx3+1] += norm[1];
 
-        norm_buffer[3*idx1+2] += norm[2];
-        norm_buffer[3*idx2+2] += norm[2];
-        norm_buffer[3*idx3+2] += norm[2];
+        norm_buffer[idx1+2] += norm[2];
+        norm_buffer[idx2+2] += norm[2];
+        norm_buffer[idx3+2] += norm[2];
     }
 }
 
