@@ -9,7 +9,6 @@ out vec3 fragNor;
 out vec3 fragPos;
 
 uniform bool knee;
-uniform vec3 lightdir;
 
 
 void main()
@@ -17,7 +16,7 @@ void main()
    fragPos = (vertPos * M).xyz;
 
    gl_Position = P * V * M * vertPos;
-   //fragNor = (M * vec4(vertNor, 0.0)).xyz;
-   fragNor = vec3(0,0,0);
+   fragNor = (M * vec4(vertNor, 0.0)).xyz;
+   //fragNor = vec3(0,0,0);
 
 }

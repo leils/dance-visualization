@@ -1085,6 +1085,7 @@ static void initGeom() {
     glBindBuffer(GL_ARRAY_BUFFER, AnkleNormalID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_ankle_normal_buffer), g_vertex_ankle_normal_buffer, GL_STATIC_DRAW);
 
+    cout << glGetError() << endl;
     //clear
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -1128,7 +1129,7 @@ static void init()
     prog->addAttribute("vertPos");
     prog->addAttribute("vertNor");
     prog->addUniform("knee");
-    prog->addUniform("lightDir");
+    // prog->addUniform("lightDir");
 
     cam->init(window);
 }
@@ -1158,7 +1159,7 @@ static void render()
     prog->bind();
     glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
     glUniform1i(prog->getUniform("knee"), false);
-    glUniform3f(prog->getUniform("lightDir"), -1, 0, 0);
+    // glUniform3f(prog->getUniform("lightDir"), -1, 0, 0);
 
 
     // cam->mouseTracking(window, TIMESTEP);
@@ -1188,7 +1189,6 @@ static void render()
         h_pos = h_nor = -1;
 
         /*-------------------------Draw ankle--------------------*/
-        glBindVertexArray(AnkleArrayID);
 
         h_pos = prog->getAttribute("vertPos");
         glEnableVertexAttribArray(h_pos);
@@ -1196,17 +1196,17 @@ static void render()
         glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
         //ankle normals
+
         h_nor = prog->getAttribute("vertNor");
         glEnableVertexAttribArray(h_nor);
         glBindBuffer(GL_ARRAY_BUFFER, AnkleNormalID);
-        glVertexAttribPointer(h_nor, 3, GL_FLAT, GL_FALSE, 0, (const void *)0);
+        glVertexAttribPointer(h_nor, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
         glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
         glDisableVertexAttribArray(h_pos);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         /*--------------------------Draw knee---------------------*/
-        glBindVertexArray(KneeArrayID);
 
         h_pos = prog->getAttribute("vertPos");
         glUniform1i(prog->getUniform("knee"), true);
@@ -1215,10 +1215,10 @@ static void render()
         glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
 
         //kneenormals
-        // h_nor = prog->getAttribute("vertNor");
-        // glEnableVertexAttribArray(h_nor);
-        // glBindBuffer(GL_ARRAY_BUFFER, KneeNormalID);
-        // glVertexAttribPointer(h_nor, 3, GL_FLAT, GL_FALSE, 0, (const void *)0);
+        h_nor = prog->getAttribute("vertNor");
+        glEnableVertexAttribArray(h_nor);
+        glBindBuffer(GL_ARRAY_BUFFER, KneeNormalID);
+        glVertexAttribPointer(h_nor, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
         glDrawArrays(GL_TRIANGLES, 0, num_to_draw);
         glDisableVertexAttribArray(h_pos);
