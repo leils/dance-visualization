@@ -924,10 +924,11 @@ static void resize_callback(GLFWwindow *window, int width, int height) {
 void normalize_vector(float v[3])
 {
    float length = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
-   // cout << "length: " << length << endl;
-   v[0] = v[0] / length;
-   v[1] = v[1] / length;
-   v[2] = v[2] / length;
+   if (length > 0){
+       v[0] = v[0] / length;
+       v[1] = v[1] / length;
+       v[2] = v[2] / length;
+   }
 }
 
 // Stolen from Zoe's shape code
@@ -963,13 +964,12 @@ void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
 
     // cout << "full length: " << NUM_MULT * NUM_COORDS << endl;
 
-    for (int i = 0; i < (NUM_COORDS * NUM_MULT)/3; i++) {
+    for (int i = 0; i < (NUM_COORDS * NUM_MULT)/3; i+=3) {
         //All the vertices should be in order in the first place ...
-        idx1 = (3 * i) + 0;
-        idx2 = (3 * i) + 1;
-        idx3 = (3 * i) + 2;
+        idx1 = 3 * (i + 0);
+        idx2 = 3 * (i + 1);
+        idx3 = 3 * (i + 2);
 
-        // printf("Indices: %d, %d, %d\n", idx1, idx2, idx3);
 
         //The below should be all of the vertices for 1 triangle
         v[0][0] = vert_buffer[idx1+0];
@@ -984,9 +984,9 @@ void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
         v[2][1]= vert_buffer[idx3+1];
         v[2][2]= vert_buffer[idx3+2];
 
-        // printf("Vertices: (%f, %f, %f)\n", v[0][0], v[0][1], v[0][2]);
 
         calc_normal(v, norm);
+
 
         norm_buffer[idx1+0] += norm[0];
         norm_buffer[idx2+0] += norm[0];
@@ -999,6 +999,28 @@ void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
         norm_buffer[idx1+2] += norm[2];
         norm_buffer[idx2+2] += norm[2];
         norm_buffer[idx3+2] += norm[2];
+
+        // norm_buffer[idx1+0] = norm[0];
+        // norm_buffer[idx2+0] = norm[0];
+        // norm_buffer[idx3+0] = norm[0];
+        //
+        // norm_buffer[idx1+1] = norm[1];
+        // norm_buffer[idx2+1] = norm[1];
+        // norm_buffer[idx3+1] = norm[1];
+        //
+        // norm_buffer[idx1+2] = norm[2];
+        // norm_buffer[idx2+2] = norm[2];
+        // norm_buffer[idx3+2] = norm[2];
+
+        if ((idx3 < 25) || ((idx3 < 300) && (idx3 > 290)))
+        {
+            printf("Vertices: a(%f, %f, %f)\n", v[0][0], v[0][1], v[0][2]);
+            printf("Vertices: b(%f, %f, %f)\n", v[1][0], v[1][1], v[1][2]);
+            printf("Vertices: c(%f, %f, %f)\n", v[2][0], v[2][1], v[2][2]);
+            printf("Indexes: (%d, %d, %d)\n", idx1, idx2, idx3);
+            printf("Normal: (%f, %f, %f)\n", norm[0], norm[1], norm[2]);
+
+        }
     }
 }
 
@@ -1100,6 +1122,8 @@ static void initGeom() {
     glGenBuffers(1, &KneeNormalID);
     glBindBuffer(GL_ARRAY_BUFFER, KneeNormalID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_knee_normal_buffer), g_vertex_knee_normal_buffer, GL_STATIC_DRAW);
+
+    //Note: static means this specific data will not change.
 
     //clear
     glBindBuffer(GL_ARRAY_BUFFER, 0);
