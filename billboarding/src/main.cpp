@@ -14,7 +14,7 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #include "Camera.h"
 
 #define NUM_COORDS (401 * 3) // Number of coordinates in each section of the swing dancing mocap
-#define NUM_MULT 6 // Each coordinate generates 5 other coordinates
+#define NUM_MULT 6 // Each coordinate generates 5 other coordinates (vertices of the triangle)
 #define TIMESTEP .05
 
 using namespace std;
@@ -432,7 +432,9 @@ static GLfloat knee_buffer[] = {
 
 };
 GLuint KneeArrayID;
+GLuint KneeNormalID;
 static GLfloat g_vertex_knee_buffer[NUM_COORDS * NUM_MULT];
+static GLfloat g_vertex_knee_normal_buffer[NUM_COORDS * NUM_MULT];
 GLuint knee_vertexbuffer;
 
 static GLfloat ankle_buffer[] = {
@@ -840,8 +842,10 @@ static GLfloat ankle_buffer[] = {
     -3.03827697754,-1.95392425537,8.60815246582
 };
 GLuint AnkleArrayID;
+GLuint AnkleNormalID;
 // Array to fill with the converted vertices
 static GLfloat g_vertex_ankle_buffer[NUM_COORDS * NUM_MULT];
+static GLfloat g_vertex_ankle_normal_buffer[NUM_COORDS * NUM_MULT];
 GLuint ankle_vertexbuffer;
 
 int g_width, g_height;
@@ -916,6 +920,104 @@ static void resize_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
+//Stolen from Zoe's shape code
+void normalize_vector(float v[3])
+{
+   float length = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
+   if (length > 0){
+       v[0] = v[0] / length;
+       v[1] = v[1] / length;
+       v[2] = v[2] / length;
+   }
+}
+
+// Stolen from Zoe's shape code
+void calc_normal(float v[3][3], float out[3])
+{
+   float v1[3],v2[3];
+   static const int x = 0;
+   static const int y = 1;
+   static const int z = 2;
+   // Calculate two vectors from the three points
+   v1[x] = v[0][x] - v[1][x];
+   v1[y] = v[0][y] - v[1][y];
+   v1[z] = v[0][z] - v[1][z];
+   v2[x] = v[1][x] - v[2][x];
+   v2[y] = v[1][y] - v[2][y];
+   v2[z] = v[1][z] - v[2][z];
+   // Take the cross product of the two vectors to get
+   // the normal vector which will be stored in out
+   out[x] = v1[y]*v2[z] - v1[z]*v2[y];
+   out[y] = v1[z]*v2[x] - v1[x]*v2[z];
+   out[z] = v1[x]*v2[y] - v1[y]*v2[x];
+   // Normalize the vector
+   normalize_vector(out);
+}
+
+void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
+{
+    int idx1, idx2, idx3;
+    float v[3][3];
+    float norm[3];
+
+    // cout << "full length: " << NUM_MULT * NUM_COORDS << endl;
+
+    for (int i = 0; i < (NUM_COORDS * NUM_MULT)/3; i+=3) {
+        //All the vertices should be in order in the first place ...
+        idx1 = 3 * (i + 0);
+        idx2 = 3 * (i + 1);
+        idx3 = 3 * (i + 2);
+
+
+        //The below should be all of the vertices for 1 triangle
+        v[0][0] = vert_buffer[idx1+0];
+        v[0][1] = vert_buffer[idx1+1];
+        v[0][2] = vert_buffer[idx1+2];
+
+        v[1][0]= vert_buffer[idx2+0];
+        v[1][1]= vert_buffer[idx2+1];
+        v[1][2]= vert_buffer[idx2+2];
+
+        v[2][0]= vert_buffer[idx3+0];
+        v[2][1]= vert_buffer[idx3+1];
+        v[2][2]= vert_buffer[idx3+2];
+
+
+        calc_normal(v, norm);
+
+        norm_buffer[idx1+0] = norm[0];
+        norm_buffer[idx2+0] = norm[0];
+        norm_buffer[idx3+0] = norm[0];
+
+        norm_buffer[idx1+1] = norm[1];
+        norm_buffer[idx2+1] = norm[1];
+        norm_buffer[idx3+1] = norm[1];
+
+        norm_buffer[idx1+2] = norm[2];
+        norm_buffer[idx2+2] = norm[2];
+        norm_buffer[idx3+2] = norm[2];
+
+        if ((idx3 < 25) || ((idx3 < 300) && (idx3 > 290)))
+        {
+            printf("Vertices: a(%f, %f, %f)\n", v[0][0], v[0][1], v[0][2]);
+            printf("Vertices: b(%f, %f, %f)\n", v[1][0], v[1][1], v[1][2]);
+            printf("Vertices: c(%f, %f, %f)\n", v[2][0], v[2][1], v[2][2]);
+            printf("Indexes: (%d, %d, %d)\n", idx1, idx2, idx3);
+            printf("Normal: (%f, %f, %f)\n", norm[0], norm[1], norm[2]);
+
+        }
+    }
+}
+
+
+// TODO: I should also be able to calculate the normals here, because I have all
+// the vertices of the triangles.
+/*
+ * Normals are stored in a normal buffer, 1:1 with the vertices.
+ * That is, each one of the vertices stored here (in the triangles) gets a copy of
+ * the normal for that triangle. So for a given triangle, its normal n will get stored
+ * three times.
+ */
 static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
     GLfloat ax, ay, az, prime_ay, bx, by, bz, prime_by;
     int j = 0;
@@ -930,6 +1032,7 @@ static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
         prime_ay = ay - .5;
         prime_by = by - .5;
 
+        // TRIANGLE 1
         // Push A
         out_buffer[j++] = ax;
         out_buffer[j++] = ay;
@@ -945,6 +1048,7 @@ static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
         out_buffer[j++] = by;
         out_buffer[j++] = bz;
 
+        // TRIANGLE 2
         // Push B
         out_buffer[j++] = bx;
         out_buffer[j++] = by;
@@ -965,26 +1069,47 @@ static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
 }
 
 static void initGeom() {
+    //generate vertex buffer to hand off to OGL
+    convertVertices(ankle_buffer, g_vertex_ankle_buffer);
+    convertVertices(knee_buffer, g_vertex_knee_buffer);
+    compute_normals(g_vertex_ankle_buffer, g_vertex_ankle_normal_buffer);
+    compute_normals(g_vertex_knee_buffer, g_vertex_knee_normal_buffer);
+
+    /* -------------------ANKLE----------------- */
     //generate the VAO
     glGenVertexArrays(1, &AnkleArrayID);
     glBindVertexArray(AnkleArrayID);
 
-    glGenVertexArrays(2, &KneeArrayID);
-    glBindVertexArray(KneeArrayID);
-
-    //generate vertex buffer to hand off to OGL
-    convertVertices(ankle_buffer, g_vertex_ankle_buffer);
-    convertVertices(knee_buffer, g_vertex_knee_buffer);
-
+    // Ankle Vertex Buffer
     glGenBuffers(1, &ankle_vertexbuffer);
     //set the current state to focus on our vertex buffer
     glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
     //actually memcopy the data - only do this once
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_ankle_buffer), g_vertex_ankle_buffer, GL_DYNAMIC_DRAW);
 
+    // Ankle Normal Buffer
+    glGenBuffers(1, &AnkleNormalID);
+    glBindBuffer(GL_ARRAY_BUFFER, AnkleNormalID);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_ankle_normal_buffer), g_vertex_ankle_normal_buffer, GL_STATIC_DRAW);
+
+    cout << glGetError() << endl;
+    //clear
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    /* ------------------- KNEE ------------------------*/
+    glGenVertexArrays(2, &KneeArrayID);
+    glBindVertexArray(KneeArrayID);
+
     glGenBuffers(2, &knee_vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_knee_buffer), g_vertex_knee_buffer, GL_DYNAMIC_DRAW);
+
+    glGenBuffers(1, &KneeNormalID);
+    glBindBuffer(GL_ARRAY_BUFFER, KneeNormalID);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_knee_normal_buffer), g_vertex_knee_normal_buffer, GL_STATIC_DRAW);
+
+    //clear
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 static void init()
@@ -1011,7 +1136,7 @@ static void init()
     prog->addAttribute("vertPos");
     prog->addAttribute("vertNor");
     prog->addUniform("knee");
-    prog->addUniform("lightDir");
+    // prog->addUniform("lightDir");
 
     cam->init(window);
 }
@@ -1041,7 +1166,7 @@ static void render()
     prog->bind();
     glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
     glUniform1i(prog->getUniform("knee"), false);
-    glUniform3f(prog->getUniform("lightDir"), -1, 0, 0);
+    // glUniform3f(prog->getUniform("lightDir"), -1, 0, 0);
 
 
     // cam->mouseTracking(window, TIMESTEP);
@@ -1067,22 +1192,44 @@ static void render()
         glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
         //set up pulling of vertices
         int num_to_draw = t * 9;
+        int h_pos, h_nor;
+        h_pos = h_nor = -1;
 
-        //Draw ankle
-        glEnableVertexAttribArray(0);
+        /*-------------------------Draw ankle--------------------*/
+
+        h_pos = prog->getAttribute("vertPos");
+        glEnableVertexAttribArray(h_pos);
         glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-        glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
-        glDisableVertexAttribArray(0);
+        glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
-        //Draw knee
+        //ankle normals
+
+        h_nor = prog->getAttribute("vertNor");
+        glEnableVertexAttribArray(h_nor);
+        glBindBuffer(GL_ARRAY_BUFFER, AnkleNormalID);
+        glVertexAttribPointer(h_nor, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
+
+        glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
+        glDisableVertexAttribArray(h_pos);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        /*--------------------------Draw knee---------------------*/
+
+        h_pos = prog->getAttribute("vertPos");
         glUniform1i(prog->getUniform("knee"), true);
-        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(h_pos);
         glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-        // glDrawArrays(GL_TRIANGLES, 0, NUM_COORDS * NUM_MULT);
+        glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+
+        //kneenormals
+        h_nor = prog->getAttribute("vertNor");
+        glEnableVertexAttribArray(h_nor);
+        glBindBuffer(GL_ARRAY_BUFFER, KneeNormalID);
+        glVertexAttribPointer(h_nor, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
+
         glDrawArrays(GL_TRIANGLES, 0, num_to_draw);
-        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(h_pos);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // Pop matrix stacks.
     M->popMatrix();

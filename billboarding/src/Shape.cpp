@@ -18,7 +18,7 @@ Shape::Shape() :
 	eleBufID(0),
 	posBufID(0),
 	norBufID(0),
-	texBufID(0), 
+	texBufID(0),
    vaoID(0)
 {
 }
@@ -41,7 +41,7 @@ void Shape::loadMesh(const string &meshName)
 		cerr << errStr << endl;
 	} else {
 		posBuf = shapes[0].mesh.positions;
-		norBuf = shapes[0].mesh.normals; 
+		norBuf = shapes[0].mesh.normals;
 		texBuf = shapes[0].mesh.texcoords;
 		eleBuf = shapes[0].mesh.indices;
 
@@ -51,7 +51,7 @@ void Shape::loadMesh(const string &meshName)
 	}
 }
 
-void normalize(float v[3]) 
+void normalize(float v[3])
 {
    float length = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
    v[0] = v[0] / length;
@@ -60,25 +60,25 @@ void normalize(float v[3])
 
 }
 
-void calcNormal(float v[3][3], float out[3]) 
+void calcNormal(float v[3][3], float out[3])
 {
-   float v1[3],v2[3]; 
-   static const int x = 0; 
-   static const int y = 1; 
+   float v1[3],v2[3];
+   static const int x = 0;
+   static const int y = 1;
    static const int z = 2;
-   // Calculate two vectors from the three points 
+   // Calculate two vectors from the three points
    v1[x] = v[0][x] - v[1][x];
    v1[y] = v[0][y] - v[1][y];
    v1[z] = v[0][z] - v[1][z];
-   v2[x] = v[1][x] - v[2][x]; 
-   v2[y] = v[1][y] - v[2][y]; 
+   v2[x] = v[1][x] - v[2][x];
+   v2[y] = v[1][y] - v[2][y];
    v2[z] = v[1][z] - v[2][z];
-   // Take the cross product of the two vectors to get 
-   // the normal vector which will be stored in out 
+   // Take the cross product of the two vectors to get
+   // the normal vector which will be stored in out
    out[x] = v1[y]*v2[z] - v1[z]*v2[y];
    out[y] = v1[z]*v2[x] - v1[x]*v2[z];
    out[z] = v1[x]*v2[y] - v1[y]*v2[x];
-   // Normalize the vector 
+   // Normalize the vector
    //cout << "before " << out[x] << out[y] << out[z] << endl;
    normalize(out);
    //cout << "after " << out[x] << out[y] << out[z] << endl;
@@ -205,8 +205,8 @@ void Shape::init()
 	glGenBuffers(1, &posBufID);
 	glBindBuffer(GL_ARRAY_BUFFER, posBufID);
 	glBufferData(GL_ARRAY_BUFFER, posBuf.size()*sizeof(float), &posBuf[0], GL_STATIC_DRAW);
-	
-	// Send the normal array to the GPU // SOMETHING HERE
+
+	// Send the normal array to the GPU 
 	if(norBuf.empty()) {
 		norBufID = 0;
 	} else {
@@ -214,7 +214,7 @@ void Shape::init()
 		glBindBuffer(GL_ARRAY_BUFFER, norBufID);
 		glBufferData(GL_ARRAY_BUFFER, norBuf.size()*sizeof(float), &norBuf[0], GL_STATIC_DRAW);
 	}
-	
+
 	// Send the texture array to the GPU
 	if(texBuf.empty()) {
 		texBufID = 0;
@@ -223,16 +223,16 @@ void Shape::init()
 		glBindBuffer(GL_ARRAY_BUFFER, texBufID);
 		glBufferData(GL_ARRAY_BUFFER, texBuf.size()*sizeof(float), &texBuf[0], GL_STATIC_DRAW);
 	}
-	
+
 	// Send the element array to the GPU
 	glGenBuffers(1, &eleBufID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eleBufID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, eleBuf.size()*sizeof(unsigned int), &eleBuf[0], GL_STATIC_DRAW);
-	
+
 	// Unbind the arrays
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	
+
 	assert(glGetError() == GL_NO_ERROR);
 }
 
@@ -247,7 +247,7 @@ void Shape::draw(const shared_ptr<Program> prog) const
 	GLSL::enableVertexAttribArray(h_pos);
 	glBindBuffer(GL_ARRAY_BUFFER, posBufID);
 	glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
-	
+
 	// Bind normal buffer
 	h_nor = prog->getAttribute("vertNor");
 	if(h_nor != -1 && norBufID != 0) {
@@ -256,7 +256,7 @@ void Shape::draw(const shared_ptr<Program> prog) const
 		glVertexAttribPointer(h_nor, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 	}
 
-	if (texBufID != 0) {	
+	if (texBufID != 0) {
 		// Bind texcoords buffer
 		h_tex = prog->getAttribute("vertTex");
 		if(h_tex != -1 && texBufID != 0) {
@@ -265,13 +265,13 @@ void Shape::draw(const shared_ptr<Program> prog) const
 			glVertexAttribPointer(h_tex, 2, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 		}
 	}
-	
+
 	// Bind element buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eleBufID);
-	
+
 	// Draw
 	glDrawElements(GL_TRIANGLES, (int)eleBuf.size(), GL_UNSIGNED_INT, (const void *)0);
-	
+
 	// Disable and unbind
 	if(h_tex != -1) {
 		GLSL::disableVertexAttribArray(h_tex);
