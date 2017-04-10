@@ -12,6 +12,7 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #include "MatrixStack.h"
 #include "shape.h"
 #include "Camera.h"
+#include "util.h"
 
 #define NUM_COORDS (401 * 3) // Number of coordinates in each section of the swing dancing mocap
 #define NUM_MULT 6 // Each coordinate generates 5 other coordinates (vertices of the triangle)
@@ -920,17 +921,17 @@ static void resize_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-//Stolen from Zoe's shape code
-void normalize_vector(float v[3])
-{
-   float length = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
-   if (length > 0){
-       v[0] = v[0] / length;
-       v[1] = v[1] / length;
-       v[2] = v[2] / length;
-   }
-}
-
+// //Stolen from Zoe's shape code
+// void normalize_vector(float v[3])
+// {
+//    float length = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
+//    if (length > 0){
+//        v[0] = v[0] / length;
+//        v[1] = v[1] / length;
+//        v[2] = v[2] / length;
+//    }
+// }
+//
 // Stolen from Zoe's shape code
 void calc_normal(float v[3][3], float out[3])
 {
