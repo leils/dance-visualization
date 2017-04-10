@@ -951,9 +951,7 @@ void calc_normal(float v[3][3], float out[3])
    out[y] = v1[z]*v2[x] - v1[x]*v2[z];
    out[z] = v1[x]*v2[y] - v1[y]*v2[x];
    // Normalize the vector
-   // cout << "before " << out[x] << out[y] << out[z] << endl;
    normalize_vector(out);
-   // cout << "after " << out[x] << out[y] << out[z] << endl;
 }
 
 void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
@@ -987,30 +985,17 @@ void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
 
         calc_normal(v, norm);
 
+        norm_buffer[idx1+0] = norm[0];
+        norm_buffer[idx2+0] = norm[0];
+        norm_buffer[idx3+0] = norm[0];
 
-        norm_buffer[idx1+0] += norm[0];
-        norm_buffer[idx2+0] += norm[0];
-        norm_buffer[idx3+0] += norm[0];
+        norm_buffer[idx1+1] = norm[1];
+        norm_buffer[idx2+1] = norm[1];
+        norm_buffer[idx3+1] = norm[1];
 
-        norm_buffer[idx1+1] += norm[1];
-        norm_buffer[idx2+1] += norm[1];
-        norm_buffer[idx3+1] += norm[1];
-
-        norm_buffer[idx1+2] += norm[2];
-        norm_buffer[idx2+2] += norm[2];
-        norm_buffer[idx3+2] += norm[2];
-
-        // norm_buffer[idx1+0] = norm[0];
-        // norm_buffer[idx2+0] = norm[0];
-        // norm_buffer[idx3+0] = norm[0];
-        //
-        // norm_buffer[idx1+1] = norm[1];
-        // norm_buffer[idx2+1] = norm[1];
-        // norm_buffer[idx3+1] = norm[1];
-        //
-        // norm_buffer[idx1+2] = norm[2];
-        // norm_buffer[idx2+2] = norm[2];
-        // norm_buffer[idx3+2] = norm[2];
+        norm_buffer[idx1+2] = norm[2];
+        norm_buffer[idx2+2] = norm[2];
+        norm_buffer[idx3+2] = norm[2];
 
         if ((idx3 < 25) || ((idx3 < 300) && (idx3 > 290)))
         {
@@ -1122,8 +1107,6 @@ static void initGeom() {
     glGenBuffers(1, &KneeNormalID);
     glBindBuffer(GL_ARRAY_BUFFER, KneeNormalID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_knee_normal_buffer), g_vertex_knee_normal_buffer, GL_STATIC_DRAW);
-
-    //Note: static means this specific data will not change.
 
     //clear
     glBindBuffer(GL_ARRAY_BUFFER, 0);
