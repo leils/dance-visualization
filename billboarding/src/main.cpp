@@ -964,16 +964,6 @@ void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
         norm_buffer[idx1+2] = norm[2];
         norm_buffer[idx2+2] = norm[2];
         norm_buffer[idx3+2] = norm[2];
-
-        if ((idx3 < 25) || ((idx3 < 300) && (idx3 > 290)))
-        {
-            printf("Vertices: a(%f, %f, %f)\n", v[0][0], v[0][1], v[0][2]);
-            printf("Vertices: b(%f, %f, %f)\n", v[1][0], v[1][1], v[1][2]);
-            printf("Vertices: c(%f, %f, %f)\n", v[2][0], v[2][1], v[2][2]);
-            printf("Indexes: (%d, %d, %d)\n", idx1, idx2, idx3);
-            printf("Normal: (%f, %f, %f)\n", norm[0], norm[1], norm[2]);
-
-        }
     }
 }
 
