@@ -1136,7 +1136,7 @@ static void init()
     prog->addAttribute("vertPos");
     prog->addAttribute("vertNor");
     prog->addUniform("knee");
-    // prog->addUniform("lightDir");
+    prog->addUniform("lightDir");
 
     cam->init(window);
 }
@@ -1166,7 +1166,7 @@ static void render()
     prog->bind();
     glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
     glUniform1i(prog->getUniform("knee"), false);
-    // glUniform3f(prog->getUniform("lightDir"), -1, 0, 0);
+    glUniform3f(prog->getUniform("lightDir"), -1, 0, 0);
 
 
     // cam->mouseTracking(window, TIMESTEP);
