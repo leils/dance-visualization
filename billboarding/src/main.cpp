@@ -843,6 +843,7 @@ static GLfloat ankle_buffer[] = {
 };
 GLuint AnkleArrayID;
 GLuint AnkleNormalID;
+GLuint AnkleColorID;
 // Array to fill with the converted vertices
 static GLfloat g_vertex_ankle_buffer[NUM_COORDS * NUM_MULT];
 static GLfloat g_vertex_ankle_normal_buffer[NUM_COORDS * NUM_MULT];
@@ -998,15 +999,15 @@ void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
         norm_buffer[idx2+2] = norm[2];
         norm_buffer[idx3+2] = norm[2];
 
-        if ((idx3 < 25) || ((idx3 < 300) && (idx3 > 290)))
-        {
-            printf("Vertices: a(%f, %f, %f)\n", v[0][0], v[0][1], v[0][2]);
-            printf("Vertices: b(%f, %f, %f)\n", v[1][0], v[1][1], v[1][2]);
-            printf("Vertices: c(%f, %f, %f)\n", v[2][0], v[2][1], v[2][2]);
-            printf("Indexes: (%d, %d, %d)\n", idx1, idx2, idx3);
-            printf("Normal: (%f, %f, %f)\n", norm[0], norm[1], norm[2]);
-
-        }
+        // if ((idx3 < 25) || ((idx3 < 300) && (idx3 > 290)))
+        // {
+        //     printf("Vertices: a(%f, %f, %f)\n", v[0][0], v[0][1], v[0][2]);
+        //     printf("Vertices: b(%f, %f, %f)\n", v[1][0], v[1][1], v[1][2]);
+        //     printf("Vertices: c(%f, %f, %f)\n", v[2][0], v[2][1], v[2][2]);
+        //     printf("Indexes: (%d, %d, %d)\n", idx1, idx2, idx3);
+        //     printf("Normal: (%f, %f, %f)\n", norm[0], norm[1], norm[2]);
+        //
+        // }
     }
 }
 
@@ -1072,15 +1073,16 @@ static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
 void walkTriangles(GLfloat in_buffer[], GLfloat out_buffer[]){
     int i;
     for (i = 0; i * 3 < NUM_COORDS * NUM_MULT; i++){
-        if (i < 500){
-            out_buffer[i] = 1;
-        }
-        else {
+        if (i < 300){ //There are approx. 502 triangles
             out_buffer[i] = 0;
         }
+        else {
+            out_buffer[i] = 1;
+        }
     }
-
+    // printf("End of triangles: %f, %f, %f\n", out_buffer[--i], out_buffer[--i], out_buffer[--i]);
 }
+
 
 static void initGeom() {
     //generate vertex buffer to hand off to OGL
@@ -1106,6 +1108,10 @@ static void initGeom() {
     glGenBuffers(1, &AnkleNormalID);
     glBindBuffer(GL_ARRAY_BUFFER, AnkleNormalID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_ankle_normal_buffer), g_vertex_ankle_normal_buffer, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &AnkleColorID);
+    glBindBuffer(GL_ARRAY_BUFFER, AnkleColorID);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(ankle_color_buffer), ankle_color_buffer, GL_STATIC_DRAW);
 
     cout << glGetError() << endl;
     //clear
@@ -1150,6 +1156,7 @@ static void init()
     /* TODO(leia): Eventually just take this out */
     prog->addAttribute("vertPos");
     prog->addAttribute("vertNor");
+    prog->addAttribute("vertColor");
     prog->addUniform("knee");
     // prog->addUniform("lightDir");
 
@@ -1207,8 +1214,8 @@ static void render()
         glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
         //set up pulling of vertices
         int num_to_draw = t * 9;
-        int h_pos, h_nor;
-        h_pos = h_nor = -1;
+        int h_pos, h_nor, v;
+        h_pos = h_nor = v = -1;
 
         /*-------------------------Draw ankle--------------------*/
 
@@ -1224,6 +1231,11 @@ static void render()
         glEnableVertexAttribArray(h_nor);
         glBindBuffer(GL_ARRAY_BUFFER, AnkleNormalID);
         glVertexAttribPointer(h_nor, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
+
+        v = prog->getAttribute("vertColor");
+        glEnableVertexAttribArray(v);
+        glBindBuffer(GL_ARRAY_BUFFER, AnkleColorID);
+        glVertexAttribPointer(v, 1, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
         glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
         glDisableVertexAttribArray(h_pos);
