@@ -12,6 +12,7 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #include "MatrixStack.h"
 #include "shape.h"
 #include "Camera.h"
+#include "util.h"
 
 #define NUM_COORDS (401 * 3) // Number of coordinates in each section of the swing dancing mocap
 #define NUM_MULT 6 // Each coordinate generates 5 other coordinates (vertices of the triangle)
@@ -921,40 +922,7 @@ static void resize_callback(GLFWwindow *window, int width, int height) {
     g_height = height;
     glViewport(0, 0, width, height);
 }
-
-//Stolen from Zoe's shape code
-void normalize_vector(float v[3])
-{
-   float length = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
-   if (length > 0){
-       v[0] = v[0] / length;
-       v[1] = v[1] / length;
-       v[2] = v[2] / length;
-   }
-}
-
-// Stolen from Zoe's shape code
-void calc_normal(float v[3][3], float out[3])
-{
-   float v1[3],v2[3];
-   static const int x = 0;
-   static const int y = 1;
-   static const int z = 2;
-   // Calculate two vectors from the three points
-   v1[x] = v[0][x] - v[1][x];
-   v1[y] = v[0][y] - v[1][y];
-   v1[z] = v[0][z] - v[1][z];
-   v2[x] = v[1][x] - v[2][x];
-   v2[y] = v[1][y] - v[2][y];
-   v2[z] = v[1][z] - v[2][z];
-   // Take the cross product of the two vectors to get
-   // the normal vector which will be stored in out
-   out[x] = v1[y]*v2[z] - v1[z]*v2[y];
-   out[y] = v1[z]*v2[x] - v1[x]*v2[z];
-   out[z] = v1[x]*v2[y] - v1[y]*v2[x];
-   // Normalize the vector
-   normalize_vector(out);
-}
+// calc_normal
 
 void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
 {
@@ -998,16 +966,6 @@ void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
         norm_buffer[idx1+2] = norm[2];
         norm_buffer[idx2+2] = norm[2];
         norm_buffer[idx3+2] = norm[2];
-
-        // if ((idx3 < 25) || ((idx3 < 300) && (idx3 > 290)))
-        // {
-        //     printf("Vertices: a(%f, %f, %f)\n", v[0][0], v[0][1], v[0][2]);
-        //     printf("Vertices: b(%f, %f, %f)\n", v[1][0], v[1][1], v[1][2]);
-        //     printf("Vertices: c(%f, %f, %f)\n", v[2][0], v[2][1], v[2][2]);
-        //     printf("Indexes: (%d, %d, %d)\n", idx1, idx2, idx3);
-        //     printf("Normal: (%f, %f, %f)\n", norm[0], norm[1], norm[2]);
-        //
-        // }
     }
 }
 
@@ -1158,7 +1116,7 @@ static void init()
     prog->addAttribute("vertNor");
     prog->addAttribute("vertColor");
     prog->addUniform("knee");
-    // prog->addUniform("lightDir");
+    prog->addUniform("lightDir");
 
     cam->init(window);
 }
@@ -1188,7 +1146,7 @@ static void render()
     prog->bind();
     glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
     glUniform1i(prog->getUniform("knee"), false);
-    // glUniform3f(prog->getUniform("lightDir"), -1, 0, 0);
+    glUniform3f(prog->getUniform("lightDir"), -5, -3, 5);
 
 
     // cam->mouseTracking(window, TIMESTEP);

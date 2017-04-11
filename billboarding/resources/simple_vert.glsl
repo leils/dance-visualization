@@ -18,6 +18,4 @@ void main()
 
    gl_Position = P * V * M * vertPos;
    fragNor = (M * vec4(vertNor, 0.0)).xyz;
-   //fragNor = vec3(0,0,0);
-
 }
