@@ -1124,7 +1124,7 @@ static void render()
     prog->bind();
     glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
     glUniform1i(prog->getUniform("knee"), false);
-    glUniform3f(prog->getUniform("lightDir"), -1, 0, 0);
+    glUniform3f(prog->getUniform("lightDir"), -5, -3, 5);
 
 
     // cam->mouseTracking(window, TIMESTEP);
