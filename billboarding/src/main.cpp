@@ -846,6 +846,7 @@ GLuint AnkleNormalID;
 // Array to fill with the converted vertices
 static GLfloat g_vertex_ankle_buffer[NUM_COORDS * NUM_MULT];
 static GLfloat g_vertex_ankle_normal_buffer[NUM_COORDS * NUM_MULT];
+static GLfloat ankle_color_buffer[NUM_COORDS * NUM_MULT / 3];
 GLuint ankle_vertexbuffer;
 
 int g_width, g_height;
@@ -1068,12 +1069,26 @@ static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
     // printf("Converted vertices, i = %d\n", i);
 }
 
+void walkTriangles(GLfloat in_buffer[], GLfloat out_buffer[]){
+    int i;
+    for (i = 0; i * 3 < NUM_COORDS * NUM_MULT; i++){
+        if (i < 500){
+            out_buffer[i] = 1;
+        }
+        else {
+            out_buffer[i] = 0;
+        }
+    }
+
+}
+
 static void initGeom() {
     //generate vertex buffer to hand off to OGL
     convertVertices(ankle_buffer, g_vertex_ankle_buffer);
     convertVertices(knee_buffer, g_vertex_knee_buffer);
     compute_normals(g_vertex_ankle_buffer, g_vertex_ankle_normal_buffer);
     compute_normals(g_vertex_knee_buffer, g_vertex_knee_normal_buffer);
+    walkTriangles(g_vertex_ankle_buffer, ankle_color_buffer);
 
     /* -------------------ANKLE----------------- */
     //generate the VAO
@@ -1201,6 +1216,7 @@ static void render()
         glEnableVertexAttribArray(h_pos);
         glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
         glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
+        // AHA i can use this to only send 2 at a time! this still doesn't solve my problems with repeated vertices ...
 
         //ankle normals
 
