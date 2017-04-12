@@ -434,8 +434,10 @@ static GLfloat knee_buffer[] = {
 };
 GLuint KneeArrayID;
 GLuint KneeNormalID;
+GLuint KneeColorID;
 static GLfloat g_vertex_knee_buffer[NUM_COORDS * NUM_MULT];
 static GLfloat g_vertex_knee_normal_buffer[NUM_COORDS * NUM_MULT];
+static GLfloat knee_color_buffer[NUM_COORDS * NUM_MULT / 3];
 GLuint knee_vertexbuffer;
 
 static GLfloat ankle_buffer[] = {
@@ -1030,15 +1032,16 @@ static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
 
 void walkTriangles(GLfloat in_buffer[], GLfloat out_buffer[]){
     int i;
+    float j = 0.0;
     for (i = 0; i * 3 < NUM_COORDS * NUM_MULT; i++){
-        if (i < 300){ //There are approx. 502 triangles
-            out_buffer[i] = 0;
+        if (i % 100 == 0) {
+            j += .2;
+            if (j >= 1.0){
+                j = 0.0;
+            }
         }
-        else {
-            out_buffer[i] = 1;
-        }
+        out_buffer[i] = j;
     }
-    // printf("End of triangles: %f, %f, %f\n", out_buffer[--i], out_buffer[--i], out_buffer[--i]);
 }
 
 
@@ -1049,6 +1052,7 @@ static void initGeom() {
     compute_normals(g_vertex_ankle_buffer, g_vertex_ankle_normal_buffer);
     compute_normals(g_vertex_knee_buffer, g_vertex_knee_normal_buffer);
     walkTriangles(g_vertex_ankle_buffer, ankle_color_buffer);
+    walkTriangles(g_vertex_ankle_buffer, knee_color_buffer);
 
     /* -------------------ANKLE----------------- */
     //generate the VAO
@@ -1076,16 +1080,20 @@ static void initGeom() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     /* ------------------- KNEE ------------------------*/
-    glGenVertexArrays(2, &KneeArrayID);
+    glGenVertexArrays(1, &KneeArrayID);
     glBindVertexArray(KneeArrayID);
 
-    glGenBuffers(2, &knee_vertexbuffer);
+    glGenBuffers(1, &knee_vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_knee_buffer), g_vertex_knee_buffer, GL_DYNAMIC_DRAW);
 
     glGenBuffers(1, &KneeNormalID);
     glBindBuffer(GL_ARRAY_BUFFER, KneeNormalID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_knee_normal_buffer), g_vertex_knee_normal_buffer, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &KneeColorID);
+    glBindBuffer(GL_ARRAY_BUFFER, KneeColorID);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(knee_color_buffer), knee_color_buffer, GL_STATIC_DRAW);
 
     //clear
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -1212,6 +1220,11 @@ static void render()
         glEnableVertexAttribArray(h_nor);
         glBindBuffer(GL_ARRAY_BUFFER, KneeNormalID);
         glVertexAttribPointer(h_nor, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
+
+        v = prog->getAttribute("vertColor");
+        glEnableVertexAttribArray(v);
+        glBindBuffer(GL_ARRAY_BUFFER, KneeColorID);
+        glVertexAttribPointer(v, 1, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
         glDrawArrays(GL_TRIANGLES, 0, num_to_draw);
         glDisableVertexAttribArray(h_pos);

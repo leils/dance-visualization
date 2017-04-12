@@ -8,6 +8,7 @@ uniform mat4 M;
 uniform mat4 V;
 out vec3 fragNor;
 out vec3 fragPos;
+out float fragColor;
 
 uniform bool knee;
 
@@ -18,4 +19,6 @@ void main()
 
    gl_Position = P * V * M * vertPos;
    fragNor = (M * vec4(vertNor, 0.0)).xyz;
+
+   fragColor = vertColor;
 }
