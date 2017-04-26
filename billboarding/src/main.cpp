@@ -13,6 +13,7 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #include "shape.h"
 #include "Camera.h"
 #include "util.h"
+#include "Texture.h"
 
 #define NUM_COORDS (401 * 3) // Number of coordinates in each section of the swing dancing mocap
 #define NUM_MULT 6 // Each coordinate generates 5 other coordinates (vertices of the triangle)

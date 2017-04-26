@@ -20,7 +20,7 @@ void main()
     } else {
        //vec3 normal = normalize(fragNor);
        //color = red * intensity;
-       vec4 tempColor = vec4(0, fragColor, 0, 1);
+       vec4 tempColor = vec4(fragColor, 0, 0, 1);
        //color = tempColor * intensity;
        color = tempColor;
     }
