@@ -5,6 +5,7 @@ out vec4 color;
 in vec3 light_I;
 in float fragColor;
 uniform vec3 lightDir;
+uniform sampler2D Texture0;
 
 uniform bool knee;
 

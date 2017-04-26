@@ -854,6 +854,9 @@ static GLfloat g_vertex_ankle_normal_buffer[NUM_COORDS * NUM_MULT];
 static GLfloat ankle_color_buffer[NUM_COORDS * NUM_MULT / 3];
 GLuint ankle_vertexbuffer;
 
+Texture texture0;
+GLint h_texture_0;
+
 int g_width, g_height;
 // TODO (leia): remove
 int gMat = 0;
@@ -1111,6 +1114,12 @@ static void init()
 
     initGeom();
 
+    texture0.setFilename(RESOURCE_DIR + "tartan.bmp");
+    // Initialize textures
+    texture0.setUnit(0);
+    texture0.setName("Texture0");
+    texture0.init();
+
     // Initialize the GLSL program.
     prog = make_shared<Program>();
     prog->setVerbose(true);
@@ -1120,12 +1129,14 @@ static void init()
     prog->addUniform("M");
     prog->addUniform("V");
 
-    /* TODO(leia): Eventually just take this out */
     prog->addAttribute("vertPos");
     prog->addAttribute("vertNor");
     prog->addAttribute("vertColor");
     prog->addUniform("knee");
     prog->addUniform("lightDir");
+
+    prog->addUniform("Texture0");
+    prog->addTexture(&texture0);
 
     cam->init(window);
 }
