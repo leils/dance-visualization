@@ -439,6 +439,7 @@ GLuint KneeColorID;
 static GLfloat g_vertex_knee_buffer[NUM_COORDS * NUM_MULT];
 static GLfloat g_vertex_knee_normal_buffer[NUM_COORDS * NUM_MULT];
 static GLfloat knee_color_buffer[NUM_COORDS * NUM_MULT / 3];
+static GLfloat knee_tex_buffer[(NUM_COORDS * NUM_MULT / 3) * 2]; // Texture is 2d, and 1 set of texture coords per actual coordinate
 GLuint knee_vertexbuffer;
 
 static GLfloat ankle_buffer[] = {
@@ -852,6 +853,7 @@ GLuint AnkleColorID;
 static GLfloat g_vertex_ankle_buffer[NUM_COORDS * NUM_MULT];
 static GLfloat g_vertex_ankle_normal_buffer[NUM_COORDS * NUM_MULT];
 static GLfloat ankle_color_buffer[NUM_COORDS * NUM_MULT / 3];
+static GLfloat ankle_tex_buffer[(NUM_COORDS * NUM_MULT / 3) * 2]; // Texture is 2d, and 1 set of texture coords per actual coordinate
 GLuint ankle_vertexbuffer;
 
 Texture texture0;
@@ -1037,8 +1039,8 @@ static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
 void walkTriangles(GLfloat in_buffer[], GLfloat out_buffer[]){
     int i;
     float j = 0.0;
-    for (i = 0; i * 3 < NUM_COORDS * NUM_MULT; i++){
-        if (i % 100 == 0) {
+    for (i = 0; i * 3 < NUM_COORDS * NUM_MULT; i++){ //Walking by vertex (3 floats) in in_buffer
+        if (i % 100 == 0) {//Changes colors every 100 listed vertices
             j += .2;
             if (j >= 1.0){
                 j = 0.0;
@@ -1046,6 +1048,39 @@ void walkTriangles(GLfloat in_buffer[], GLfloat out_buffer[]){
         }
         out_buffer[i] = j;
     }
+}
+
+void textureWalk(GLfloat in_buffer[], GLfloat out_buffer[]){
+    int i, j;
+    j = 0;
+    // essentially i want to input per 6 listed vertices
+    // a, b, c, c, b, d
+    // (0, 1), (0, 0), (1, 1), (1, 1), (0, 0), (1, 0)
+    // that makes 12 floats
+    // each vertex in the in_buffer is 3 floats
+    // each coordinate in the out_buffer is 2 floats
+
+    for(i = 0; i < NUM_COORDS * NUM_MULT; i+=(6 * 3)){ // 6*3 is 6 vertices * 3 floats each
+        out_buffer[j++] = 0;
+        out_buffer[j++] = 1;
+
+        out_buffer[j++] = 0;
+        out_buffer[j++] = 0;
+
+        out_buffer[j++] = 1;
+        out_buffer[j++] = 1;
+
+        out_buffer[j++] = 1;
+        out_buffer[j++] = 1;
+
+        out_buffer[j++] = 0;
+        out_buffer[j++] = 0;
+
+        out_buffer[j++] = 1;
+        out_buffer[j++] = 0;
+    }
+
+
 }
 
 
@@ -1056,7 +1091,8 @@ static void initGeom() {
     compute_normals(g_vertex_ankle_buffer, g_vertex_ankle_normal_buffer);
     compute_normals(g_vertex_knee_buffer, g_vertex_knee_normal_buffer);
     walkTriangles(g_vertex_ankle_buffer, ankle_color_buffer);
-    walkTriangles(g_vertex_ankle_buffer, knee_color_buffer);
+    walkTriangles(g_vertex_knee_buffer, knee_color_buffer);
+    textureWalk(g_vertex_ankle_buffer, ankle_tex_buffer);
 
     /* -------------------ANKLE----------------- */
     //generate the VAO
@@ -1132,6 +1168,7 @@ static void init()
     prog->addAttribute("vertPos");
     prog->addAttribute("vertNor");
     prog->addAttribute("vertColor");
+    prog->addAttribute("vertTex");
     prog->addUniform("knee");
     prog->addUniform("lightDir");
 
