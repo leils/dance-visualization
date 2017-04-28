@@ -1158,7 +1158,8 @@ static void init()
 
     initGeom();
 
-    texture0.setFilename(RESOURCE_DIR + "tartan.bmp");
+    // texture0.setFilename(RESOURCE_DIR + "tartan.bmp");
+    texture0.setFilename(RESOURCE_DIR + "brush_texture4.bmp");
     // Initialize textures
     texture0.setUnit(0);
     texture0.setName("Texture0");
