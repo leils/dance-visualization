@@ -1260,10 +1260,10 @@ static void render()
         glBindBuffer(GL_ARRAY_BUFFER, AnkleColorID);
         glVertexAttribPointer(v, 1, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
-        // tex = prog->getAttribute("vertTex");
-        // glEnableVertexAttribArray(tex);
-        // glBindBuffer(GL_ARRAY_BUFFER, AnkleTextureID);
-        // glVertexAttribPointer(v, 2, GL_FLOAT, GL_FALSE, 0, (const void *)0);
+        tex = prog->getAttribute("vertTex");
+        glEnableVertexAttribArray(tex);
+        glBindBuffer(GL_ARRAY_BUFFER, AnkleTextureID);
+        glVertexAttribPointer(tex, 2, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
         glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
         glDisableVertexAttribArray(h_pos);
@@ -1288,10 +1288,10 @@ static void render()
         glBindBuffer(GL_ARRAY_BUFFER, KneeColorID);
         glVertexAttribPointer(v, 1, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
-        // tex = prog->getAttribute("vertTex");
-        // glEnableVertexAttribArray(tex);
-        // glBindBuffer(GL_ARRAY_BUFFER, KneeTextureID);
-        // glVertexAttribPointer(v, 2, GL_FLOAT, GL_FALSE, 0, (const void *)0);
+        tex = prog->getAttribute("vertTex");
+        glEnableVertexAttribArray(tex);
+        glBindBuffer(GL_ARRAY_BUFFER, KneeTextureID);
+        glVertexAttribPointer(tex, 2, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
         glDrawArrays(GL_TRIANGLES, 0, num_to_draw);
         glDisableVertexAttribArray(h_pos);

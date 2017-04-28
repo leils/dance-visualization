@@ -19,8 +19,8 @@ void main()
     vec4 red = vec4(1,0,0,1);
     vec4 black = vec4(0,0,0,1);
     if (knee) {
-        //color =  texture(Texture0, vTexCoord);
-        color = black;
+        color =  texture(Texture0, vTexCoord);
+        //color = black;
     } else {
        //vec3 normal = normalize(fragNor);
        //color = red * intensity;
