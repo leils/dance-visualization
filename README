@@ -2,7 +2,16 @@ Senior Project: Leia Chang
 
 TODO:
 - Refactor for better IO
-    - TinyObjLoader for csv? 
-- Render based on time
-- Shading
+    - TinyObjLoader for csv?
 - Add mousetracking from 471 lab01
+
+Data used for skeleton retrieval:
+- Left front waist
+- Right front waist
+- Right back head
+- Left back head
+
+
+Things I need to do:
+- Take out these coordinates (lwaist, rwaist)
+- Draw the line (lwaist to rwaist)
