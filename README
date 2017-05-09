@@ -15,3 +15,4 @@ Data used for skeleton retrieval:
 Things I need to do:
 - Take out these coordinates (lwaist, rwaist)
 - Draw the line (lwaist to rwaist)
+    - How do we do this?
