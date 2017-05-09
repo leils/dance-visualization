@@ -1062,24 +1062,85 @@ void textureWalk(GLfloat in_buffer[], GLfloat out_buffer[]){
     // each vertex in the in_buffer is 3 floats
     // each coordinate in the out_buffer is 2 floats
 
-    for(i = 0; i < NUM_COORDS * NUM_MULT; i+=(6 * 3)){ // 6*3 is 6 vertices * 3 floats each
+    // for(i = 0; i < NUM_COORDS * NUM_MULT; i+=(6 * 3)){ // 6*3 is 6 vertices * 3 floats each
+    //     out_buffer[j++] = 0;
+    //     out_buffer[j++] = 1;
+    //
+    //     out_buffer[j++] = 0;
+    //     out_buffer[j++] = 0;
+    //
+    //     out_buffer[j++] = 1;
+    //     out_buffer[j++] = 1;
+    //
+    //     out_buffer[j++] = 1;
+    //     out_buffer[j++] = 1;
+    //
+    //     out_buffer[j++] = 0;
+    //     out_buffer[j++] = 0;
+    //
+    //     out_buffer[j++] = 1;
+    //     out_buffer[j++] = 0;
+    // }
+
+    // Stretched out: 18
+    for(i = 0; i < NUM_COORDS * NUM_MULT; i+=(6 * 3 * 3)){ // 6*3 is 6 vertices * 3 floats each * 3 squares
+        //Square 1
         out_buffer[j++] = 0;
         out_buffer[j++] = 1;
 
         out_buffer[j++] = 0;
         out_buffer[j++] = 0;
 
-        out_buffer[j++] = 1;
+        out_buffer[j++] = .3;
         out_buffer[j++] = 1;
 
-        out_buffer[j++] = 1;
+        out_buffer[j++] = .3;
         out_buffer[j++] = 1;
 
         out_buffer[j++] = 0;
         out_buffer[j++] = 0;
 
+        out_buffer[j++] = .3;
+        out_buffer[j++] = 0;
+
+        //Square 2
+        out_buffer[j++] = .3;
+        out_buffer[j++] = 1;
+
+        out_buffer[j++] = .3;
+        out_buffer[j++] = 0;
+
+        out_buffer[j++] = .6;
+        out_buffer[j++] = 1;
+
+        out_buffer[j++] = .6;
+        out_buffer[j++] = 1;
+
+        out_buffer[j++] = .3;
+        out_buffer[j++] = 0;
+
+        out_buffer[j++] = .6;
+        out_buffer[j++] = 0;
+
+        //Square 3
+        out_buffer[j++] = .6;
+        out_buffer[j++] = 1;
+
+        out_buffer[j++] = .6;
+        out_buffer[j++] = 0;
+
+        out_buffer[j++] = 1;
+        out_buffer[j++] = 1;
+
+        out_buffer[j++] = 1;
+        out_buffer[j++] = 1;
+
+        out_buffer[j++] = .6;
+        out_buffer[j++] = 0;
+
         out_buffer[j++] = 1;
         out_buffer[j++] = 0;
+
     }
 }
 

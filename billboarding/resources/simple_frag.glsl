@@ -19,7 +19,11 @@ void main()
     vec4 red = vec4(1,0,0,1);
     vec4 black = vec4(0,0,0,1);
     if (knee) {
-        color =  texture(Texture0, vTexCoord);
+        vec4 texcolor =  texture(Texture0, vTexCoord);
+        if (texcolor.r > .5 && texcolor.g > .5 && texcolor.b > .5){
+            discard;
+        }
+        color = texcolor;
         //color = black;
     } else {
        //vec3 normal = normalize(fragNor);
