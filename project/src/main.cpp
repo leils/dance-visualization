@@ -16,20 +16,23 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #include "Texture.h"
 #include "data.h"
 #include "buffer_structs.h"
+#include "Ribbon.h"
 
-#define NUM_COORDS (401 * 3) // Number of coordinates in each section of the swing dancing mocap
-#define NUM_MULT 6 // Each coordinate generates 5 other coordinates (vertices of the triangle)
-#define NUM_ALL (NUM_COORDS * NUM_MULT)
+// #define NUM_COORDS (401 * 3) // Number of coordinates in each section of the swing dancing mocap
+// #define NUM_MULT 6 // Each coordinate generates 5 other coordinates (vertices of the triangle)
+// #define NUM_ALL (NUM_COORDS * NUM_MULT)
 #define TIMESTEP .05
 
 using namespace std;
 using namespace Eigen;
+
 
 GLFWwindow *window; // Main application window
 string RESOURCE_DIR = ""; // Where the resources are loaded from
 shared_ptr<Program> ribbon_prog;
 
 Camera *cam = new Camera();
+Ribbon *testRibbon = new Ribbon();
 
 // Array to fill with the converted vertices (Only for Ankle Ribbons)
 static GLfloat g_vertex_right_ankle_buffer[NUM_ALL];
