@@ -27,7 +27,7 @@ using namespace Eigen;
 
 GLFWwindow *window; // Main application window
 string RESOURCE_DIR = ""; // Where the resources are loaded from
-shared_ptr<Program> prog;
+shared_ptr<Program> ribbon_prog;
 
 Camera *cam = new Camera();
 
@@ -396,23 +396,23 @@ static void init()
     texture0.init();
 
     // Initialize the GLSL program.
-    prog = make_shared<Program>();
-    prog->setVerbose(true);
-    prog->setShaderNames(RESOURCE_DIR + "simple_vert.glsl", RESOURCE_DIR + "simple_frag.glsl");
-    prog->init();
-    prog->addUniform("P");
-    prog->addUniform("M");
-    prog->addUniform("V");
+    ribbon_prog = make_shared<Program>();
+    ribbon_prog->setVerbose(true);
+    ribbon_prog->setShaderNames(RESOURCE_DIR + "ribbon_vert.glsl", RESOURCE_DIR + "ribbon_frag.glsl");
+    ribbon_prog->init();
+    ribbon_prog->addUniform("P");
+    ribbon_prog->addUniform("M");
+    ribbon_prog->addUniform("V");
 
-    prog->addAttribute("vertPos");
-    prog->addAttribute("vertNor");
-    prog->addAttribute("vertColor");
-    prog->addAttribute("vertTex");
-    prog->addUniform("knee");
-    prog->addUniform("lightDir");
+    ribbon_prog->addAttribute("vertPos");
+    ribbon_prog->addAttribute("vertNor");
+    ribbon_prog->addAttribute("vertColor");
+    ribbon_prog->addAttribute("vertTex");
+    ribbon_prog->addUniform("knee");
+    ribbon_prog->addUniform("lightDir");
 
-    prog->addUniform("Texture0");
-    prog->addTexture(&texture0);
+    ribbon_prog->addUniform("Texture0");
+    ribbon_prog->addTexture(&texture0);
 
     cam->init(window);
 }
@@ -438,11 +438,11 @@ static void render()
     P->pushMatrix();
     P->perspective(45.0f, aspect, 0.01f, 100.0f);
 
-    // bind this program, start drawing perspective
-    prog->bind();
-    glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
-    glUniform1i(prog->getUniform("knee"), false);
-    glUniform3f(prog->getUniform("lightDir"), -5, -3, 5);
+    // bind this ribbon_program, start drawing perspective
+    ribbon_prog->bind();
+    glUniformMatrix4fv(ribbon_prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
+    glUniform1i(ribbon_prog->getUniform("knee"), false);
+    glUniform3f(ribbon_prog->getUniform("lightDir"), -5, -3, 5);
 
     // cam->mouseTracking(window, TIMESTEP);
     // mouse_track(window);
@@ -457,14 +457,14 @@ static void render()
 
     V->lookAt(cam->getPosition(), cam->getLookatPt(), cam->getUp());
     // V->lookAt(eye, lookAtPt, up);
-    glUniformMatrix4fv(prog->getUniform("V"), 1, GL_FALSE, V->topMatrix().data());
+    glUniformMatrix4fv(ribbon_prog->getUniform("V"), 1, GL_FALSE, V->topMatrix().data());
 
     M->pushMatrix();
     M->loadIdentity();
 
     // M->translate(Vector3f(0, 0, -20));
     M->rotate(90, Vector3f(1, 0, 0)); //Rotate by 90 degrees for correct orientation
-        glUniformMatrix4fv(prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
+        glUniformMatrix4fv(ribbon_prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
         //set up pulling of vertices
         int num_to_draw = t * 9;
         int h_pos, h_nor, v, tex;
@@ -472,23 +472,23 @@ static void render()
 
         /*-------------------------Draw Right ankle--------------------*/
 
-        h_pos = prog->getAttribute("vertPos");
+        h_pos = ribbon_prog->getAttribute("vertPos");
         glEnableVertexAttribArray(h_pos);
         glBindBuffer(GL_ARRAY_BUFFER, right_ankle_vertexbuffer);
         glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
         //ankle normals
-        h_nor = prog->getAttribute("vertNor");
+        h_nor = ribbon_prog->getAttribute("vertNor");
         glEnableVertexAttribArray(h_nor);
         glBindBuffer(GL_ARRAY_BUFFER, Right_AnkleNormalID);
         glVertexAttribPointer(h_nor, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
-        v = prog->getAttribute("vertColor");
+        v = ribbon_prog->getAttribute("vertColor");
         glEnableVertexAttribArray(v);
         glBindBuffer(GL_ARRAY_BUFFER, Right_AnkleColorID);
         glVertexAttribPointer(v, 1, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
-        tex = prog->getAttribute("vertTex");
+        tex = ribbon_prog->getAttribute("vertTex");
         glEnableVertexAttribArray(tex);
         glBindBuffer(GL_ARRAY_BUFFER, Right_AnkleTextureID);
         glVertexAttribPointer(tex, 2, GL_FLOAT, GL_FALSE, 0, (const void *)0);
@@ -499,23 +499,23 @@ static void render()
 
         /*-------------------------Draw Left ankle--------------------*/
 
-        h_pos = prog->getAttribute("vertPos");
+        h_pos = ribbon_prog->getAttribute("vertPos");
         glEnableVertexAttribArray(h_pos);
         glBindBuffer(GL_ARRAY_BUFFER, left_ankle_vertexbuffer);
         glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
         //ankle normals
-        h_nor = prog->getAttribute("vertNor");
+        h_nor = ribbon_prog->getAttribute("vertNor");
         glEnableVertexAttribArray(h_nor);
         glBindBuffer(GL_ARRAY_BUFFER, Left_AnkleNormalID);
         glVertexAttribPointer(h_nor, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
-        v = prog->getAttribute("vertColor");
+        v = ribbon_prog->getAttribute("vertColor");
         glEnableVertexAttribArray(v);
         glBindBuffer(GL_ARRAY_BUFFER, Left_AnkleColorID);
         glVertexAttribPointer(v, 1, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
-        tex = prog->getAttribute("vertTex");
+        tex = ribbon_prog->getAttribute("vertTex");
         glEnableVertexAttribArray(tex);
         glBindBuffer(GL_ARRAY_BUFFER, Left_AnkleTextureID);
         glVertexAttribPointer(tex, 2, GL_FLOAT, GL_FALSE, 0, (const void *)0);
@@ -528,7 +528,7 @@ static void render()
     M->popMatrix();
     P->popMatrix();
 
-    prog->unbind();
+    ribbon_prog->unbind();
     t++;
 }
 
