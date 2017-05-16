@@ -1,6 +1,6 @@
 #include "Ribbon.h"
 
-Ribbon::Ribbon()
+Ribbon::Ribbon(GLfloat buffer[])
 {
     test = 1;
 

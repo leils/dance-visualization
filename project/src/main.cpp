@@ -32,7 +32,7 @@ string RESOURCE_DIR = ""; // Where the resources are loaded from
 shared_ptr<Program> ribbon_prog;
 
 Camera *cam = new Camera();
-Ribbon *testRibbon = new Ribbon();
+Ribbon *testRibbon = new Ribbon(right_knee_buffer);
 
 // Array to fill with the converted vertices (Only for Ankle Ribbons)
 static GLfloat g_vertex_right_ankle_buffer[NUM_ALL];
