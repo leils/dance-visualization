@@ -32,7 +32,7 @@ shared_ptr<Program> prog;
 Camera *cam = new Camera();
 
 // Array to fill with the converted vertices
-static GLfloat g_vertex_ankle_buffer[NUM_ALL];
+static GLfloat g_vertex_right_ankle_buffer[NUM_ALL];
 static GLfloat g_vertex_ankle_normal_buffer[NUM_ALL];
 static GLfloat ankle_color_buffer[NUM_ALL/ 3];
 static GLfloat ankle_tex_buffer[(NUM_ALL/ 3) * 2]; // Texture is 2d, and 1 set of texture coords per actual coordinate
@@ -41,8 +41,6 @@ Texture texture0;
 GLint h_texture_0;
 
 int g_width, g_height;
-// TODO (leia): remove
-int gMat = 0;
 int t;
 
 // Eye vectors for viewpoint moving
@@ -303,38 +301,38 @@ void textureWalk(GLfloat in_buffer[], GLfloat out_buffer[]){
 
 static void initGeom() {
     //generate vertex buffer to hand off to OGL
-    convertVertices(ankle_buffer, g_vertex_ankle_buffer);
-    compute_normals(g_vertex_ankle_buffer, g_vertex_ankle_normal_buffer);
-    walkTriangles(g_vertex_ankle_buffer, ankle_color_buffer);
+    convertVertices(right_ankle_buffer, g_vertex_right_ankle_buffer);
+    compute_normals(g_vertex_right_ankle_buffer, g_vertex_ankle_normal_buffer);
+    walkTriangles(g_vertex_right_ankle_buffer, ankle_color_buffer);
 
-    // convertVertices(knee_buffer, g_vertex_knee_buffer);
-    // compute_normals(g_vertex_knee_buffer, g_vertex_knee_normal_buffer);
-    // walkTriangles(g_vertex_knee_buffer, knee_color_buffer);
-    // textureWalk(g_vertex_knee_buffer, knee_tex_buffer);
+    // convertVertices(right_knee_buffer, g_vertex_right_knee_buffer);
+    // compute_normals(g_vertex_right_knee_buffer, g_vertex_knee_normal_buffer);
+    // walkTriangles(g_vertex_right_knee_buffer, knee_color_buffer);
+    // textureWalk(g_vertex_right_knee_buffer, knee_tex_buffer);
 
     /* -------------------ANKLE----------------- */
     //generate the VAO
-    glGenVertexArrays(1, &AnkleArrayID);
-    glBindVertexArray(AnkleArrayID);
+    glGenVertexArrays(1, &Right_AnkleArrayID);
+    glBindVertexArray(Right_AnkleArrayID);
 
-    // Ankle Vertex Buffer
-    glGenBuffers(1, &ankle_vertexbuffer);
+    // Right_Ankle Vertex Buffer
+    glGenBuffers(1, &right_ankle_vertexbuffer);
     //set the current state to focus on our vertex buffer
-    glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, right_ankle_vertexbuffer);
     //actually memcopy the data - only do this once
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_ankle_buffer), g_vertex_ankle_buffer, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_right_ankle_buffer), g_vertex_right_ankle_buffer, GL_DYNAMIC_DRAW);
 
-    // Ankle Normal Buffer
-    glGenBuffers(1, &AnkleNormalID);
-    glBindBuffer(GL_ARRAY_BUFFER, AnkleNormalID);
+    // Right_Ankle Normal Buffer
+    glGenBuffers(1, &Right_AnkleNormalID);
+    glBindBuffer(GL_ARRAY_BUFFER, Right_AnkleNormalID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_ankle_normal_buffer), g_vertex_ankle_normal_buffer, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &AnkleColorID);
-    glBindBuffer(GL_ARRAY_BUFFER, AnkleColorID);
+    glGenBuffers(1, &Right_AnkleColorID);
+    glBindBuffer(GL_ARRAY_BUFFER, Right_AnkleColorID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(ankle_color_buffer), ankle_color_buffer, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &AnkleTextureID);
-    glBindBuffer(GL_ARRAY_BUFFER, AnkleTextureID);
+    glGenBuffers(1, &Right_AnkleTextureID);
+    glBindBuffer(GL_ARRAY_BUFFER, Right_AnkleTextureID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(ankle_tex_buffer), ankle_tex_buffer, GL_STATIC_DRAW);
 
     cout << glGetError() << endl;
@@ -442,29 +440,29 @@ static void render()
 
         h_pos = prog->getAttribute("vertPos");
         glEnableVertexAttribArray(h_pos);
-        glBindBuffer(GL_ARRAY_BUFFER, ankle_vertexbuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, right_ankle_vertexbuffer);
         glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
         //ankle normals
         h_nor = prog->getAttribute("vertNor");
         glEnableVertexAttribArray(h_nor);
-        glBindBuffer(GL_ARRAY_BUFFER, AnkleNormalID);
+        glBindBuffer(GL_ARRAY_BUFFER, Right_AnkleNormalID);
         glVertexAttribPointer(h_nor, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
         v = prog->getAttribute("vertColor");
         glEnableVertexAttribArray(v);
-        glBindBuffer(GL_ARRAY_BUFFER, AnkleColorID);
+        glBindBuffer(GL_ARRAY_BUFFER, Right_AnkleColorID);
         glVertexAttribPointer(v, 1, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
         tex = prog->getAttribute("vertTex");
         glEnableVertexAttribArray(tex);
-        glBindBuffer(GL_ARRAY_BUFFER, AnkleTextureID);
+        glBindBuffer(GL_ARRAY_BUFFER, Right_AnkleTextureID);
         glVertexAttribPointer(tex, 2, GL_FLOAT, GL_FALSE, 0, (const void *)0);
 
         glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
         glDisableVertexAttribArray(h_pos);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        
+
     // Pop matrix stacks.
     M->popMatrix();
     P->popMatrix();
