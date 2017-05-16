@@ -15,9 +15,11 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #include "util.h"
 #include "Texture.h"
 #include "data.h"
+#include "buffer_structs.h"
 
 #define NUM_COORDS (401 * 3) // Number of coordinates in each section of the swing dancing mocap
 #define NUM_MULT 6 // Each coordinate generates 5 other coordinates (vertices of the triangle)
+#define NUM_ALL (NUM_COORDS * NUM_MULT)
 #define TIMESTEP .05
 
 using namespace std;
@@ -29,26 +31,11 @@ shared_ptr<Program> prog;
 
 Camera *cam = new Camera();
 
-GLuint KneeArrayID;
-GLuint KneeNormalID;
-GLuint KneeColorID;
-GLuint KneeTextureID;
-static GLfloat g_vertex_knee_buffer[NUM_COORDS * NUM_MULT];
-static GLfloat g_vertex_knee_normal_buffer[NUM_COORDS * NUM_MULT];
-static GLfloat knee_color_buffer[NUM_COORDS * NUM_MULT / 3];
-static GLfloat knee_tex_buffer[(NUM_COORDS * NUM_MULT / 3) * 2]; // Texture is 2d, and 1 set of texture coords per actual coordinate
-GLuint knee_vertexbuffer;
-
-GLuint AnkleArrayID;
-GLuint AnkleNormalID;
-GLuint AnkleColorID;
-GLuint AnkleTextureID;
 // Array to fill with the converted vertices
-static GLfloat g_vertex_ankle_buffer[NUM_COORDS * NUM_MULT];
-static GLfloat g_vertex_ankle_normal_buffer[NUM_COORDS * NUM_MULT];
-static GLfloat ankle_color_buffer[NUM_COORDS * NUM_MULT / 3];
-static GLfloat ankle_tex_buffer[(NUM_COORDS * NUM_MULT / 3) * 2]; // Texture is 2d, and 1 set of texture coords per actual coordinate
-GLuint ankle_vertexbuffer;
+static GLfloat g_vertex_ankle_buffer[NUM_ALL];
+static GLfloat g_vertex_ankle_normal_buffer[NUM_ALL];
+static GLfloat ankle_color_buffer[NUM_ALL/ 3];
+static GLfloat ankle_tex_buffer[(NUM_ALL/ 3) * 2]; // Texture is 2d, and 1 set of texture coords per actual coordinate
 
 Texture texture0;
 GLint h_texture_0;
@@ -134,7 +121,7 @@ void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
 
     // cout << "full length: " << NUM_MULT * NUM_COORDS << endl;
 
-    for (int i = 0; i < (NUM_COORDS * NUM_MULT)/3; i+=3) {
+    for (int i = 0; i < (NUM_ALL)/3; i+=3) {
         //All the vertices should be in order in the first place ...
         idx1 = 3 * (i + 0);
         idx2 = 3 * (i + 1);
@@ -252,7 +239,7 @@ void textureWalk(GLfloat in_buffer[], GLfloat out_buffer[]){
     // each coordinate in the out_buffer is 2 floats
 
     // Stretched out: 18
-    for(i = 0; i < NUM_COORDS * NUM_MULT; i+=(6 * 3 * 3)){ // 6*3 is 6 vertices * 3 floats each * 3 squares
+    for(i = 0; i < NUM_ALL; i+=(6 * 3 * 3)){ // 6*3 is 6 vertices * 3 floats each * 3 squares
         //Square 1
         out_buffer[j++] = 0;
         out_buffer[j++] = 1;
@@ -317,12 +304,13 @@ void textureWalk(GLfloat in_buffer[], GLfloat out_buffer[]){
 static void initGeom() {
     //generate vertex buffer to hand off to OGL
     convertVertices(ankle_buffer, g_vertex_ankle_buffer);
-    convertVertices(knee_buffer, g_vertex_knee_buffer);
     compute_normals(g_vertex_ankle_buffer, g_vertex_ankle_normal_buffer);
-    compute_normals(g_vertex_knee_buffer, g_vertex_knee_normal_buffer);
     walkTriangles(g_vertex_ankle_buffer, ankle_color_buffer);
-    walkTriangles(g_vertex_knee_buffer, knee_color_buffer);
-    textureWalk(g_vertex_knee_buffer, knee_tex_buffer);
+
+    // convertVertices(knee_buffer, g_vertex_knee_buffer);
+    // compute_normals(g_vertex_knee_buffer, g_vertex_knee_normal_buffer);
+    // walkTriangles(g_vertex_knee_buffer, knee_color_buffer);
+    // textureWalk(g_vertex_knee_buffer, knee_tex_buffer);
 
     /* -------------------ANKLE----------------- */
     //generate the VAO
@@ -352,26 +340,6 @@ static void initGeom() {
     cout << glGetError() << endl;
     //clear
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    /* ------------------- KNEE ------------------------*/
-    glGenVertexArrays(1, &KneeArrayID);
-    glBindVertexArray(KneeArrayID);
-
-    glGenBuffers(1, &knee_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_knee_buffer), g_vertex_knee_buffer, GL_DYNAMIC_DRAW);
-
-    glGenBuffers(1, &KneeNormalID);
-    glBindBuffer(GL_ARRAY_BUFFER, KneeNormalID);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_knee_normal_buffer), g_vertex_knee_normal_buffer, GL_STATIC_DRAW);
-
-    glGenBuffers(1, &KneeColorID);
-    glBindBuffer(GL_ARRAY_BUFFER, KneeColorID);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(knee_color_buffer), knee_color_buffer, GL_STATIC_DRAW);
-
-    glGenBuffers(1, &KneeTextureID);
-    glBindBuffer(GL_ARRAY_BUFFER, KneeTextureID);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(knee_tex_buffer), knee_tex_buffer, GL_STATIC_DRAW);
 
     //clear
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -444,7 +412,6 @@ static void render()
     glUniform1i(prog->getUniform("knee"), false);
     glUniform3f(prog->getUniform("lightDir"), -5, -3, 5);
 
-
     // cam->mouseTracking(window, TIMESTEP);
     // mouse_track(window);
     lookAtPt = Vector3f(cos(phi) * cos (theta), sin(phi), cos(phi) * cos((M_PI / 2) - theta)) + eye;
@@ -497,35 +464,7 @@ static void render()
         glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
         glDisableVertexAttribArray(h_pos);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        /*--------------------------Draw knee---------------------*/
-
-        h_pos = prog->getAttribute("vertPos");
-        glUniform1i(prog->getUniform("knee"), true);
-        glEnableVertexAttribArray(h_pos);
-        glBindBuffer(GL_ARRAY_BUFFER, knee_vertexbuffer);
-        glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-
-        //kneenormals
-        h_nor = prog->getAttribute("vertNor");
-        glEnableVertexAttribArray(h_nor);
-        glBindBuffer(GL_ARRAY_BUFFER, KneeNormalID);
-        glVertexAttribPointer(h_nor, 3, GL_FLOAT, GL_FALSE, 0, (const void *)0);
-
-        v = prog->getAttribute("vertColor");
-        glEnableVertexAttribArray(v);
-        glBindBuffer(GL_ARRAY_BUFFER, KneeColorID);
-        glVertexAttribPointer(v, 1, GL_FLOAT, GL_FALSE, 0, (const void *)0);
-
-        tex = prog->getAttribute("vertTex");
-        glEnableVertexAttribArray(tex);
-        glBindBuffer(GL_ARRAY_BUFFER, KneeTextureID);
-        glVertexAttribPointer(tex, 2, GL_FLOAT, GL_FALSE, 0, (const void *)0);
-
-        glDrawArrays(GL_TRIANGLES, 0, num_to_draw);
-        glDisableVertexAttribArray(h_pos);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+        
     // Pop matrix stacks.
     M->popMatrix();
     P->popMatrix();
