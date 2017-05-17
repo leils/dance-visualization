@@ -18,6 +18,9 @@ GLuint left_waist_vertexbuffer;
 GLuint Right_WaistArrayID;
 GLuint right_waist_vertexbuffer;
 
+GLuint Full_WaistArrayID;
+GLuint full_waist_vertexbuffer;
+
 GLuint Right_KneeArrayID;
 GLuint right_knee_vertexbuffer;
 

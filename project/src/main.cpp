@@ -44,6 +44,8 @@ static GLfloat g_vertex_left_ankle_normal_buffer[NUM_ALL];
 static GLfloat left_ankle_color_buffer[NUM_ALL/ 3];
 static GLfloat left_ankle_tex_buffer[(NUM_ALL/ 3) * 2]; // Texture is 2d, and 1 set of texture coords per actual coordinate
 
+static GLfloat g_vertex_waist_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+
 Texture texture0;
 GLint h_texture_0;
 
@@ -309,6 +311,19 @@ void textureWalk(GLfloat in_buffer[], GLfloat out_buffer[])
     }
 }
 
+void stackCoordinates(GLfloat a[], GLfloat b[], GLfloat out_buffer[])
+{
+    int j = 0;
+    for (int i = 0; i < NUM_COORDS; i += 3){
+        out_buffer[j++] = a[i];
+        out_buffer[j++] = a[i + 1];
+        out_buffer[j++] = a[i + 2];
+
+        out_buffer[j++] = b[i];
+        out_buffer[j++] = b[i + 1];
+        out_buffer[j++] = b[i + 2];
+    }
+}
 
 static void initGeom()
 {
@@ -322,6 +337,7 @@ static void initGeom()
     compute_normals(g_vertex_left_ankle_buffer, g_vertex_left_ankle_normal_buffer);
     walkTriangles(g_vertex_left_ankle_buffer, left_ankle_color_buffer);
     textureWalk(g_vertex_left_ankle_buffer, left_ankle_tex_buffer);
+
 
     /* -------------------ANKLE----------------- */
     //generate the VAO
@@ -373,38 +389,49 @@ static void initGeom()
     glBindBuffer(GL_ARRAY_BUFFER, Left_AnkleTextureID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(left_ankle_tex_buffer), left_ankle_tex_buffer, GL_STATIC_DRAW);
 
-    /* ----------------- Left Waist ---------------*/
-    glGenVertexArrays(1, &Left_WaistArrayID);
-    glBindVertexArray(Left_WaistArrayID);
+    // /* ----------------- Left Waist ---------------*/
+    // glGenVertexArrays(1, &Left_WaistArrayID);
+    // glBindVertexArray(Left_WaistArrayID);
+    //
+    // glGenBuffers(1, &left_waist_vertexbuffer);
+    // glBindBuffer(GL_ARRAY_BUFFER, left_waist_vertexbuffer);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(left_front_waist), left_front_waist, GL_DYNAMIC_DRAW);
+    //
+    // /* ----------------- Right Waist ---------------*/
+    // glGenVertexArrays(1, &Right_WaistArrayID);
+    // glBindVertexArray(Right_WaistArrayID);
+    //
+    // glGenBuffers(1, &right_waist_vertexbuffer);
+    // glBindBuffer(GL_ARRAY_BUFFER, right_waist_vertexbuffer);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(right_front_waist), right_front_waist, GL_DYNAMIC_DRAW);
+    //
+    //
+    /* ----------------- Full Waist ---------------*/
+    stackCoordinates(right_front_waist, left_front_waist, g_vertex_waist_buffer);
 
-    glGenBuffers(1, &left_waist_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, left_waist_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(left_front_waist), left_front_waist, GL_DYNAMIC_DRAW);
+    glGenVertexArrays(1, &Full_WaistArrayID);
+    glBindVertexArray(Full_WaistArrayID);
 
-    /* ----------------- Right Waist ---------------*/
-    glGenVertexArrays(1, &Right_WaistArrayID);
-    glBindVertexArray(Right_WaistArrayID);
+    glGenBuffers(1, &full_waist_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, full_waist_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_waist_buffer), g_vertex_waist_buffer, GL_DYNAMIC_DRAW);
 
-    glGenBuffers(1, &right_waist_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, right_waist_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(right_front_waist), right_front_waist, GL_DYNAMIC_DRAW);
-
-    /* ----------------- Left Knee---------------*/
-    glGenVertexArrays(1, &Left_KneeArrayID);
-    glBindVertexArray(Left_KneeArrayID);
-
-    glGenBuffers(1, &left_knee_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, left_knee_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(left_knee_buffer), left_knee_buffer, GL_DYNAMIC_DRAW);
-
-    /* ----------------- Right Knee---------------*/
-    glGenVertexArrays(1, &Right_KneeArrayID);
-    glBindVertexArray(Right_KneeArrayID);
-
-    glGenBuffers(1, &right_knee_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, right_knee_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(right_knee_buffer), right_knee_buffer, GL_DYNAMIC_DRAW);
-
+    // /* ----------------- Left Knee---------------*/
+    // glGenVertexArrays(1, &Left_KneeArrayID);
+    // glBindVertexArray(Left_KneeArrayID);
+    //
+    // glGenBuffers(1, &left_knee_vertexbuffer);
+    // glBindBuffer(GL_ARRAY_BUFFER, left_knee_vertexbuffer);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(left_knee_buffer), left_knee_buffer, GL_DYNAMIC_DRAW);
+    //
+    // /* ----------------- Right Knee---------------*/
+    // glGenVertexArrays(1, &Right_KneeArrayID);
+    // glBindVertexArray(Right_KneeArrayID);
+    //
+    // glGenBuffers(1, &right_knee_vertexbuffer);
+    // glBindBuffer(GL_ARRAY_BUFFER, right_knee_vertexbuffer);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(right_knee_buffer), right_knee_buffer, GL_DYNAMIC_DRAW);
+    //
 
     cout << glGetError() << endl;
     //clear
@@ -419,7 +446,7 @@ static void init()
     GLSL::checkVersion();
     t = 0;
     // Set background color.
-    glClearColor(.56f, .56f, .56f, 1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     // Enable z-buffer test.
     glEnable(GL_DEPTH_TEST);
     // glPointSize(10.0f);
@@ -583,23 +610,13 @@ static void render()
     glUniformMatrix4fv(line_prog->getUniform("V"), 1, GL_FALSE, V->topMatrix().data());
     glUniformMatrix4fv(line_prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
 
-    // Draw points on Left Waist
+    //Draw waist lines
     h_pos = line_prog->getAttribute("vertPos");
     glEnableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, left_waist_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, full_waist_vertexbuffer);
     glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
-    glDrawArrays(GL_LINES, 0, NUM_COORDS); // TODO: adding a time based amt here
-    glDisableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // Draw points on Right Waist
-    h_pos = line_prog->getAttribute("vertPos");
-    glEnableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, right_waist_vertexbuffer);
-    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-
-    glDrawArrays(GL_LINES, 0, NUM_COORDS); // TODO: adding a time based amt here
+    glDrawArrays(GL_LINES, 0, NUM_COORDS * 2); // TODO: adding a time based amt here
     glDisableVertexAttribArray(h_pos);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
