@@ -11,7 +11,7 @@ class Ribbon
 {
 public:
     Ribbon(GLfloat buffer[]);
-    static GLfloat g_vertex_buffer[NUM_ALL];
+    static GLfloat g_vertex_buffer[NUM_ALL]; //TODO: static won't fly here, that means only one copy of this is ever made
     static GLfloat g_normal_buffer[NUM_ALL];
     static GLfloat color_buffer[NUM_ALL / 3];
     static GLfloat tex_buffer[(NUM_ALL / 3) * 2];
