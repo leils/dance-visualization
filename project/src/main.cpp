@@ -81,6 +81,7 @@ static void calculate_directions()
     }
 }
 
+// TODO: Timestep this
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
@@ -169,7 +170,8 @@ void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
  * the normal for that triangle. So for a given triangle, its normal n will get stored
  * three times.
  */
-static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
+static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[])
+{
     GLfloat ax, ay, az, prime_ay, bx, by, bz, prime_by;
     int j = 0;
     int i;
@@ -219,7 +221,8 @@ static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[]) {
     // printf("Converted vertices, i = %d\n", i);
 }
 
-void walkTriangles(GLfloat in_buffer[], GLfloat out_buffer[]){
+void walkTriangles(GLfloat in_buffer[], GLfloat out_buffer[])
+{
     int i;
     float j = 0.0;
     for (i = 0; i * 3 < NUM_COORDS * NUM_MULT; i++){ //Walking by vertex (3 floats) in in_buffer
@@ -233,7 +236,8 @@ void walkTriangles(GLfloat in_buffer[], GLfloat out_buffer[]){
     }
 }
 
-void textureWalk(GLfloat in_buffer[], GLfloat out_buffer[]){
+void textureWalk(GLfloat in_buffer[], GLfloat out_buffer[])
+{
     int i, j;
     j = 0;
     // essentially i want to input per 6 listed vertices
@@ -306,20 +310,18 @@ void textureWalk(GLfloat in_buffer[], GLfloat out_buffer[]){
 }
 
 
-static void initGeom() {
+static void initGeom()
+{
     //generate vertex buffer to hand off to OGL
     convertVertices(right_ankle_buffer, g_vertex_right_ankle_buffer);
     compute_normals(g_vertex_right_ankle_buffer, g_vertex_right_ankle_normal_buffer);
     walkTriangles(g_vertex_right_ankle_buffer, right_ankle_color_buffer);
+    textureWalk(g_vertex_right_ankle_buffer, right_ankle_tex_buffer);
 
     convertVertices(left_ankle_buffer, g_vertex_left_ankle_buffer);
     compute_normals(g_vertex_left_ankle_buffer, g_vertex_left_ankle_normal_buffer);
     walkTriangles(g_vertex_left_ankle_buffer, left_ankle_color_buffer);
-
-    // convertVertices(left_knee_buffer, g_vertex_right_knee_buffer);
-    // compute_normals(g_vertex_right_knee_buffer, g_vertex_knee_normal_buffer);
-    // walkTriangles(g_vertex_right_knee_buffer, knee_color_buffer);
-    // textureWalk(g_vertex_right_knee_buffer, knee_tex_buffer);
+    textureWalk(g_vertex_left_ankle_buffer, left_ankle_tex_buffer);
 
     /* -------------------ANKLE----------------- */
     //generate the VAO
@@ -371,6 +373,15 @@ static void initGeom() {
     glBindBuffer(GL_ARRAY_BUFFER, Left_AnkleTextureID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(left_ankle_tex_buffer), left_ankle_tex_buffer, GL_STATIC_DRAW);
 
+    /* ----------------- Left Waist ---------------*/
+    glGenVertexArrays(1, &Left_WaistArrayID);
+    glBindVertexArray(Left_WaistArrayID);
+
+    glGenBuffers(1, &left_waist_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, left_waist_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(left_front_waist), left_front_waist, GL_DYNAMIC_DRAW);
+
+
     cout << glGetError() << endl;
     //clear
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -390,7 +401,6 @@ static void init()
 
     initGeom();
 
-    // texture0.setFilename(RESOURCE_DIR + "tartan.bmp");
     texture0.setFilename(RESOURCE_DIR + "brush_texture4.bmp");
     // Initialize textures
     texture0.setUnit(0);
@@ -410,7 +420,6 @@ static void init()
     ribbon_prog->addAttribute("vertNor");
     ribbon_prog->addAttribute("vertColor");
     ribbon_prog->addAttribute("vertTex");
-    ribbon_prog->addUniform("knee");
     ribbon_prog->addUniform("lightDir");
 
     ribbon_prog->addUniform("Texture0");
@@ -443,7 +452,6 @@ static void render()
     // bind this ribbon_program, start drawing perspective
     ribbon_prog->bind();
     glUniformMatrix4fv(ribbon_prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
-    glUniform1i(ribbon_prog->getUniform("knee"), false);
     glUniform3f(ribbon_prog->getUniform("lightDir"), -5, -3, 5);
 
     // cam->mouseTracking(window, TIMESTEP);

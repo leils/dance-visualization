@@ -1,3 +1,6 @@
+#ifndef _UTIL_H_
+#define _UTIL_H_
+
 void normalize_vector(float v[3])
 {
    float length = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
@@ -30,3 +33,5 @@ void calc_normal(float v[3][3], float out[3])
    // Normalize the vector
    normalize_vector(out);
 }
+
+#endif

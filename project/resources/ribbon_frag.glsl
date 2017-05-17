@@ -1,3 +1,4 @@
+// Renders ribbons in repeated textured form
 #version 330 core
 in vec3 fragNor;
 in vec3 fragPos;
@@ -18,19 +19,11 @@ void main()
 
     vec4 red = vec4(1,0,0,1);
     vec4 black = vec4(0,0,0,1);
-    if (knee) {
-        vec4 texcolor =  texture(Texture0, vTexCoord);
-        if (texcolor.r > .5 && texcolor.g > .5 && texcolor.b > .5){
-            discard;
-        }
-        color = texcolor;
-        //color = black;
-    } else {
-       //vec3 normal = normalize(fragNor);
-       //color = red * intensity;
-       vec4 tempColor = vec4(fragColor, 0, 0, 1);
-       //color = tempColor * intensity;
-       color = tempColor;
+
+    vec4 texcolor =  texture(Texture0, vTexCoord);
+    if (texcolor.r > .5 && texcolor.g > .5 && texcolor.b > .5){
+        discard;
     }
+    color = texcolor;
 
 }
