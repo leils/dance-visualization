@@ -381,6 +381,30 @@ static void initGeom()
     glBindBuffer(GL_ARRAY_BUFFER, left_waist_vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(left_front_waist), left_front_waist, GL_DYNAMIC_DRAW);
 
+    /* ----------------- Right Waist ---------------*/
+    glGenVertexArrays(1, &Right_WaistArrayID);
+    glBindVertexArray(Right_WaistArrayID);
+
+    glGenBuffers(1, &right_waist_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, right_waist_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(right_front_waist), right_front_waist, GL_DYNAMIC_DRAW);
+
+    /* ----------------- Left Knee---------------*/
+    glGenVertexArrays(1, &Left_KneeArrayID);
+    glBindVertexArray(Left_KneeArrayID);
+
+    glGenBuffers(1, &left_knee_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, left_knee_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(left_knee_buffer), left_knee_buffer, GL_DYNAMIC_DRAW);
+
+    /* ----------------- Right Knee---------------*/
+    glGenVertexArrays(1, &Right_KneeArrayID);
+    glBindVertexArray(Right_KneeArrayID);
+
+    glGenBuffers(1, &right_knee_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, right_knee_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(right_knee_buffer), right_knee_buffer, GL_DYNAMIC_DRAW);
+
 
     cout << glGetError() << endl;
     //clear
@@ -398,7 +422,7 @@ static void init()
     glClearColor(.56f, .56f, .56f, 1.0f);
     // Enable z-buffer test.
     glEnable(GL_DEPTH_TEST);
-    glPointSize(100.0f);
+    glPointSize(10.0f);
 
     initGeom();
 
@@ -481,7 +505,7 @@ static void render()
     M->loadIdentity();
 
     // M->translate(Vector3f(0, 0, -20));
-    M->rotate(90, Vector3f(1, 0, 0)); //Rotate by 90 degrees for correct orientation
+    M->rotate(-90, Vector3f(1, 0, 0)); //Rotate by 90 degrees for correct orientation
         glUniformMatrix4fv(ribbon_prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
         //set up pulling of vertices
         int num_to_draw = t * 9;
@@ -557,22 +581,23 @@ static void render()
     glUniformMatrix4fv(line_prog->getUniform("V"), 1, GL_FALSE, V->topMatrix().data());
     glUniformMatrix4fv(line_prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
 
-    // h_pos = line_prog->getAttribute("vertPos");
-    // glEnableVertexAttribArray(h_pos);
-    // glBindBuffer(GL_ARRAY_BUFFER, left_ankle_vertexbuffer);
-    // glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-    //
-    // glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
-    // glDisableVertexAttribArray(h_pos);
-    // glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+    // Draw points on Left Waist
     h_pos = line_prog->getAttribute("vertPos");
     glEnableVertexAttribArray(h_pos);
     glBindBuffer(GL_ARRAY_BUFFER, left_waist_vertexbuffer);
     glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
-    glDrawArrays(GL_POINTS, 0, sizeof(left_waist_vertexbuffer)); // TODO: adding a time based amt here
-    // glDrawArrays(GL_POINTS, 0, num_to_draw); // TODO: adding a time based amt here
+    glDrawArrays(GL_POINTS, 0, NUM_COORDS); // TODO: adding a time based amt here
+    glDisableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // Draw points on Right Waist
+    h_pos = line_prog->getAttribute("vertPos");
+    glEnableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, right_waist_vertexbuffer);
+    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
+
+    glDrawArrays(GL_POINTS, 0, NUM_COORDS); // TODO: adding a time based amt here
     glDisableVertexAttribArray(h_pos);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 

@@ -15,4 +15,13 @@ GLuint left_ankle_vertexbuffer;
 GLuint Left_WaistArrayID;
 GLuint left_waist_vertexbuffer;
 
+GLuint Right_WaistArrayID;
+GLuint right_waist_vertexbuffer;
+
+GLuint Right_KneeArrayID;
+GLuint right_knee_vertexbuffer;
+
+GLuint Left_KneeArrayID;
+GLuint left_knee_vertexbuffer;
+
 #endif
