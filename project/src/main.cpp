@@ -28,7 +28,7 @@ using namespace Eigen;
 
 GLFWwindow *window; // Main application window
 string RESOURCE_DIR = ""; // Where the resources are loaded from
-shared_ptr<Program> ribbon_prog;
+shared_ptr<Program> ribbon_prog, line_prog;
 
 Camera *cam = new Camera();
 // Ribbon *testRibbon = new Ribbon(right_knee_buffer);
@@ -395,7 +395,7 @@ static void init()
     GLSL::checkVersion();
     t = 0;
     // Set background color.
-    glClearColor(.12f, .34f, .56f, 1.0f);
+    glClearColor(.56f, .56f, .56f, 1.0f);
     // Enable z-buffer test.
     glEnable(GL_DEPTH_TEST);
 
@@ -407,7 +407,7 @@ static void init()
     texture0.setName("Texture0");
     texture0.init();
 
-    // Initialize the GLSL program.
+    // Initialize the Ribbon GLSL program.
     ribbon_prog = make_shared<Program>();
     ribbon_prog->setVerbose(true);
     ribbon_prog->setShaderNames(RESOURCE_DIR + "ribbon_vert.glsl", RESOURCE_DIR + "ribbon_frag.glsl");
@@ -424,6 +424,16 @@ static void init()
 
     ribbon_prog->addUniform("Texture0");
     ribbon_prog->addTexture(&texture0);
+
+    // Initialize the Ribbon GLSL program.
+    line_prog = make_shared<Program>();
+    line_prog->setVerbose(true);
+    line_prog->setShaderNames(RESOURCE_DIR + "line_vert.glsl", RESOURCE_DIR + "line_frag.glsl");
+    line_prog->init();
+    line_prog->addUniform("P");
+    line_prog->addUniform("M");
+    line_prog->addUniform("V");
+    line_prog->addAttribute("vertPos");
 
     cam->init(window);
 }
@@ -448,14 +458,6 @@ static void render()
     // Apply perspective projection.
     P->pushMatrix();
     P->perspective(45.0f, aspect, 0.01f, 100.0f);
-
-    // bind this ribbon_program, start drawing perspective
-    ribbon_prog->bind();
-    glUniformMatrix4fv(ribbon_prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
-    glUniform3f(ribbon_prog->getUniform("lightDir"), -5, -3, 5);
-
-    // cam->mouseTracking(window, TIMESTEP);
-    // mouse_track(window);
     lookAtPt = Vector3f(cos(phi) * cos (theta), sin(phi), cos(phi) * cos((M_PI / 2) - theta)) + eye;
     calculate_directions();
 
@@ -464,6 +466,11 @@ static void render()
     } else {
         glfwSetCursorPos(window, 320, 240);
     }
+
+    // bind this ribbon_program, start drawing perspective
+    ribbon_prog->bind();
+    glUniformMatrix4fv(ribbon_prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
+    glUniform3f(ribbon_prog->getUniform("lightDir"), -5, -3, 5);
 
     V->lookAt(cam->getPosition(), cam->getLookatPt(), cam->getUp());
     // V->lookAt(eye, lookAtPt, up);
@@ -534,11 +541,36 @@ static void render()
         glDisableVertexAttribArray(h_pos);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    ribbon_prog->unbind();
+
+    line_prog->bind();
+    glUniformMatrix4fv(line_prog->getUniform("P"), 1, GL_FALSE, P->topMatrix().data());
+    glUniformMatrix4fv(line_prog->getUniform("V"), 1, GL_FALSE, V->topMatrix().data());
+    glUniformMatrix4fv(line_prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
+
+    // h_pos = line_prog->getAttribute("vertPos");
+    // glEnableVertexAttribArray(h_pos);
+    // glBindBuffer(GL_ARRAY_BUFFER, left_ankle_vertexbuffer);
+    // glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
+    //
+    // glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
+    // glDisableVertexAttribArray(h_pos);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    h_pos = line_prog->getAttribute("vertPos");
+    glEnableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, left_waist_vertexbuffer);
+    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
+
+    glDrawArrays(GL_POINT, 0, sizeof(left_waist_vertexbuffer)); // TODO: adding a time based amt here
+    glDisableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    line_prog->unbind();
+
     // Pop matrix stacks.
     M->popMatrix();
     P->popMatrix();
 
-    ribbon_prog->unbind();
     t++;
 }
 
