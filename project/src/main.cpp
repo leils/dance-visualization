@@ -422,7 +422,8 @@ static void init()
     glClearColor(.56f, .56f, .56f, 1.0f);
     // Enable z-buffer test.
     glEnable(GL_DEPTH_TEST);
-    glPointSize(10.0f);
+    // glPointSize(10.0f);
+    glLineWidth(100.0f);
 
     initGeom();
 
@@ -504,8 +505,9 @@ static void render()
     M->pushMatrix();
     M->loadIdentity();
 
-    // M->translate(Vector3f(0, 0, -20));
+    M->translate(Vector3f(0, -10, -20));
     M->rotate(-90, Vector3f(1, 0, 0)); //Rotate by 90 degrees for correct orientation
+    M->scale(.5);
         glUniformMatrix4fv(ribbon_prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
         //set up pulling of vertices
         int num_to_draw = t * 9;
@@ -587,7 +589,7 @@ static void render()
     glBindBuffer(GL_ARRAY_BUFFER, left_waist_vertexbuffer);
     glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
-    glDrawArrays(GL_POINTS, 0, NUM_COORDS); // TODO: adding a time based amt here
+    glDrawArrays(GL_LINES, 0, NUM_COORDS); // TODO: adding a time based amt here
     glDisableVertexAttribArray(h_pos);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -597,7 +599,7 @@ static void render()
     glBindBuffer(GL_ARRAY_BUFFER, right_waist_vertexbuffer);
     glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
-    glDrawArrays(GL_POINTS, 0, NUM_COORDS); // TODO: adding a time based amt here
+    glDrawArrays(GL_LINES, 0, NUM_COORDS); // TODO: adding a time based amt here
     glDisableVertexAttribArray(h_pos);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
