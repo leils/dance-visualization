@@ -109,15 +109,11 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
     }
 }
 
-
 static void resize_callback(GLFWwindow *window, int width, int height) {
     g_width = width;
     g_height = height;
     glViewport(0, 0, width, height);
 }
-// calc_normal
-
-
 
 static void initGeom()
 {
@@ -183,23 +179,6 @@ static void initGeom()
     glBindBuffer(GL_ARRAY_BUFFER, Left_AnkleTextureID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(left_ankle_tex_buffer), left_ankle_tex_buffer, GL_STATIC_DRAW);
 
-    // /* ----------------- Left Waist ---------------*/
-    // glGenVertexArrays(1, &Left_WaistArrayID);
-    // glBindVertexArray(Left_WaistArrayID);
-    //
-    // glGenBuffers(1, &left_waist_vertexbuffer);
-    // glBindBuffer(GL_ARRAY_BUFFER, left_waist_vertexbuffer);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(left_front_waist), left_front_waist, GL_DYNAMIC_DRAW);
-    //
-    // /* ----------------- Right Waist ---------------*/
-    // glGenVertexArrays(1, &Right_WaistArrayID);
-    // glBindVertexArray(Right_WaistArrayID);
-    //
-    // glGenBuffers(1, &right_waist_vertexbuffer);
-    // glBindBuffer(GL_ARRAY_BUFFER, right_waist_vertexbuffer);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(right_front_waist), right_front_waist, GL_DYNAMIC_DRAW);
-    //
-    //
     /* ----------------- Full Waist ---------------*/
     stackCoordinates(right_front_waist, left_front_waist, g_vertex_waist_buffer);
 
@@ -210,22 +189,6 @@ static void initGeom()
     glBindBuffer(GL_ARRAY_BUFFER, full_waist_vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_waist_buffer), g_vertex_waist_buffer, GL_DYNAMIC_DRAW);
 
-    // /* ----------------- Left Knee---------------*/
-    // glGenVertexArrays(1, &Left_KneeArrayID);
-    // glBindVertexArray(Left_KneeArrayID);
-    //
-    // glGenBuffers(1, &left_knee_vertexbuffer);
-    // glBindBuffer(GL_ARRAY_BUFFER, left_knee_vertexbuffer);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(left_knee_buffer), left_knee_buffer, GL_DYNAMIC_DRAW);
-    //
-    // /* ----------------- Right Knee---------------*/
-    // glGenVertexArrays(1, &Right_KneeArrayID);
-    // glBindVertexArray(Right_KneeArrayID);
-    //
-    // glGenBuffers(1, &right_knee_vertexbuffer);
-    // glBindBuffer(GL_ARRAY_BUFFER, right_knee_vertexbuffer);
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(right_knee_buffer), right_knee_buffer, GL_DYNAMIC_DRAW);
-    //
 
     cout << glGetError() << endl;
     //clear
