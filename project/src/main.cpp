@@ -398,6 +398,7 @@ static void init()
     glClearColor(.56f, .56f, .56f, 1.0f);
     // Enable z-buffer test.
     glEnable(GL_DEPTH_TEST);
+    glPointSize(100.0f);
 
     initGeom();
 
@@ -514,6 +515,10 @@ static void render()
         glDisableVertexAttribArray(h_pos);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+        glDisableVertexAttribArray(h_nor);
+        glDisableVertexAttribArray(v);
+        glDisableVertexAttribArray(tex);
+
         /*-------------------------Draw Left ankle--------------------*/
 
         h_pos = ribbon_prog->getAttribute("vertPos");
@@ -541,6 +546,10 @@ static void render()
         glDisableVertexAttribArray(h_pos);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+        glDisableVertexAttribArray(h_nor);
+        glDisableVertexAttribArray(v);
+        glDisableVertexAttribArray(tex);
+
     ribbon_prog->unbind();
 
     line_prog->bind();
@@ -556,12 +565,14 @@ static void render()
     // glDrawArrays(GL_TRIANGLES, 0, num_to_draw); // TODO: adding a time based amt here
     // glDisableVertexAttribArray(h_pos);
     // glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     h_pos = line_prog->getAttribute("vertPos");
     glEnableVertexAttribArray(h_pos);
     glBindBuffer(GL_ARRAY_BUFFER, left_waist_vertexbuffer);
     glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
-    glDrawArrays(GL_POINT, 0, sizeof(left_waist_vertexbuffer)); // TODO: adding a time based amt here
+    glDrawArrays(GL_POINTS, 0, sizeof(left_waist_vertexbuffer)); // TODO: adding a time based amt here
+    // glDrawArrays(GL_POINTS, 0, num_to_draw); // TODO: adding a time based amt here
     glDisableVertexAttribArray(h_pos);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
