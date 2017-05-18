@@ -12,14 +12,11 @@ GLuint Left_AnkleColorID;
 GLuint Left_AnkleTextureID;
 GLuint left_ankle_vertexbuffer;
 
-GLuint Left_WaistArrayID;
-GLuint left_waist_vertexbuffer;
-
-GLuint Right_WaistArrayID;
-GLuint right_waist_vertexbuffer;
-
 GLuint Full_WaistArrayID;
 GLuint full_waist_vertexbuffer;
+
+GLuint ShouldersArrayID;
+GLuint shoulders_vertexbuffer;
 
 GLuint Right_KneeArrayID;
 GLuint right_knee_vertexbuffer;

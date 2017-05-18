@@ -41,6 +41,7 @@ static GLfloat left_ankle_color_buffer[NUM_ALL/ 3];
 static GLfloat left_ankle_tex_buffer[(NUM_ALL/ 3) * 2]; // Texture is 2d, and 1 set of texture coords per actual coordinate
 
 static GLfloat g_vertex_waist_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_shoulder_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
 
 Texture texture0;
 GLint h_texture_0;
@@ -188,6 +189,16 @@ static void initGeom()
     glGenBuffers(1, &full_waist_vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, full_waist_vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_waist_buffer), g_vertex_waist_buffer, GL_DYNAMIC_DRAW);
+
+    /* ----------------- Full Waist ---------------*/
+    stackCoordinates(right_shoulder, left_shoulder, g_vertex_shoulder_buffer);
+
+    glGenVertexArrays(1, &ShouldersArrayID);
+    glBindVertexArray(ShouldersArrayID);
+
+    glGenBuffers(1, &shoulders_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, shoulders_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_shoulder_buffer), g_vertex_shoulder_buffer, GL_DYNAMIC_DRAW);
 
 
     cout << glGetError() << endl;
@@ -373,7 +384,20 @@ static void render()
     glBindBuffer(GL_ARRAY_BUFFER, full_waist_vertexbuffer);
     glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
-    glDrawArrays(GL_LINES, 0, NUM_COORDS * 2); // TODO: adding a time based amt here
+    // glDrawArrays(GL_LINES, 0, NUM_COORDS * 2); // TODO: adding a time based amt here
+    // glDrawArrays(GL_LINES, 0, NUM_COORDS * 2); // TODO: adding a time based amt here
+    glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
+    glDisableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    //Draw shoulder lines
+    h_pos = line_prog->getAttribute("vertPos");
+    glEnableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, shoulders_vertexbuffer);
+    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
+
+    // glDrawArrays(GL_LINES, 0, NUM_COORDS * 2); // TODO: adding a time based amt here
+    glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
     glDisableVertexAttribArray(h_pos);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
