@@ -384,8 +384,6 @@ static void render()
     glBindBuffer(GL_ARRAY_BUFFER, full_waist_vertexbuffer);
     glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
-    // glDrawArrays(GL_LINES, 0, NUM_COORDS * 2); // TODO: adding a time based amt here
-    // glDrawArrays(GL_LINES, 0, NUM_COORDS * 2); // TODO: adding a time based amt here
     glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
     glDisableVertexAttribArray(h_pos);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -396,7 +394,6 @@ static void render()
     glBindBuffer(GL_ARRAY_BUFFER, shoulders_vertexbuffer);
     glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
-    // glDrawArrays(GL_LINES, 0, NUM_COORDS * 2); // TODO: adding a time based amt here
     glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
     glDisableVertexAttribArray(h_pos);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
