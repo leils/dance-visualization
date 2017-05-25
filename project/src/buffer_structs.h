@@ -18,6 +18,18 @@ GLuint full_waist_vertexbuffer;
 GLuint ShouldersArrayID;
 GLuint shoulders_vertexbuffer;
 
+GLuint NeckArrayID;
+GLuint neck_vertexbuffer;
+
+GLuint ForeheadArrayID;
+GLuint forehead_vertexbuffer;
+
+GLuint LeftFaceArrayID;
+GLuint leftface_vertexbuffer;
+
+GLuint RightFaceArrayID;
+GLuint rightface_vertexbuffer;
+
 GLuint Right_KneeArrayID;
 GLuint right_knee_vertexbuffer;
 

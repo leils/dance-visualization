@@ -42,6 +42,9 @@ static GLfloat left_ankle_tex_buffer[(NUM_ALL/ 3) * 2]; // Texture is 2d, and 1 
 
 static GLfloat g_vertex_waist_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
 static GLfloat g_vertex_shoulder_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_forehead_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_leftface_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_rightface_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
 
 Texture texture0;
 GLint h_texture_0;
@@ -107,6 +110,8 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
         phi += .1; // turn the eye upward
     } else if (key == GLFW_KEY_DOWN) {
         phi -= .1; // turn the eye downward
+    } else if (key == GLFW_KEY_R) {
+        t = 0;
     }
 }
 
@@ -200,6 +205,44 @@ static void initGeom()
     glBindBuffer(GL_ARRAY_BUFFER, shoulders_vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_shoulder_buffer), g_vertex_shoulder_buffer, GL_DYNAMIC_DRAW);
 
+    /* ----------------- Neck ---------------*/
+    glGenVertexArrays(1, &NeckArrayID);
+    glBindVertexArray(NeckArrayID);
+
+    glGenBuffers(1, &neck_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, neck_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(back_neck), back_neck, GL_DYNAMIC_DRAW);
+
+    /* ----------------- Forehead ---------------*/
+    stackCoordinates(front_left_head, front_right_head, g_vertex_forehead_buffer);
+
+    glGenVertexArrays(1, &ForeheadArrayID);
+    glBindVertexArray(ForeheadArrayID);
+
+    glGenBuffers(1, &forehead_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, forehead_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_forehead_buffer), g_vertex_forehead_buffer, GL_DYNAMIC_DRAW);
+
+    /* ----------------- Left Face ---------------*/
+    stackCoordinates(front_left_head, back_neck, g_vertex_leftface_buffer);
+
+    glGenVertexArrays(1, &LeftFaceArrayID);
+    glBindVertexArray(LeftFaceArrayID);
+
+    glGenBuffers(1, &leftface_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, leftface_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_leftface_buffer), g_vertex_leftface_buffer, GL_DYNAMIC_DRAW);
+
+    /* ----------------- Right Face ---------------*/
+    stackCoordinates(front_right_head, back_neck, g_vertex_rightface_buffer);
+
+    glGenVertexArrays(1, &RightFaceArrayID);
+    glBindVertexArray(RightFaceArrayID);
+
+    glGenBuffers(1, &rightface_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, rightface_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_rightface_buffer), g_vertex_rightface_buffer, GL_DYNAMIC_DRAW);
+
 
     cout << glGetError() << endl;
     //clear
@@ -217,7 +260,7 @@ static void init()
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     // Enable z-buffer test.
     glEnable(GL_DEPTH_TEST);
-    // glPointSize(10.0f);
+    glPointSize(10.0f);
     // glLineWidth(100.0f); NOT WORKING: ???
 
     initGeom();
@@ -392,6 +435,46 @@ static void render()
     h_pos = line_prog->getAttribute("vertPos");
     glEnableVertexAttribArray(h_pos);
     glBindBuffer(GL_ARRAY_BUFFER, shoulders_vertexbuffer);
+    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
+
+    glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
+    glDisableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    //Draw neckpoint
+    h_pos = line_prog->getAttribute("vertPos");
+    glEnableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, neck_vertexbuffer);
+    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
+
+    glDrawArrays(GL_POINTS, t, 1); // TODO: adding a time based amt here
+    glDisableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    //Draw forehead
+    h_pos = line_prog->getAttribute("vertPos");
+    glEnableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, forehead_vertexbuffer);
+    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
+
+    glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
+    glDisableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    //Draw leftface
+    h_pos = line_prog->getAttribute("vertPos");
+    glEnableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, leftface_vertexbuffer);
+    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
+
+    glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
+    glDisableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    //Draw rightface
+    h_pos = line_prog->getAttribute("vertPos");
+    glEnableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, rightface_vertexbuffer);
     glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
     glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
