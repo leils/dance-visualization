@@ -30,10 +30,16 @@ GLuint leftface_vertexbuffer;
 GLuint RightFaceArrayID;
 GLuint rightface_vertexbuffer;
 
-GLuint Right_KneeArrayID;
-GLuint right_knee_vertexbuffer;
+GLuint Right_ThighArrayID;
+GLuint right_thigh_vertexbuffer;
 
-GLuint Left_KneeArrayID;
-GLuint left_knee_vertexbuffer;
+GLuint Left_ThighArrayID;
+GLuint left_thigh_vertexbuffer;
+
+GLuint Right_CalfArrayID;
+GLuint right_calf_vertexbuffer;
+
+GLuint Left_CalfArrayID;
+GLuint left_calf_vertexbuffer;
 
 #endif
