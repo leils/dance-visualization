@@ -232,6 +232,14 @@ static void initGeom()
     stackCoordinates(left_front_waist, left_knee_buffer, g_vertex_leftthigh_buffer);
     generateVAO(&Left_ThighArrayID, &left_thigh_vertexbuffer, g_vertex_leftthigh_buffer, sizeof(g_vertex_leftthigh_buffer));
 
+    /* ----------------- Right Calf---------------*/
+    stackCoordinates(right_knee_buffer, right_ankle_buffer, g_vertex_rightcalf_buffer);
+    generateVAO(&Right_CalfArrayID, &right_calf_vertexbuffer, g_vertex_rightcalf_buffer, sizeof(g_vertex_rightcalf_buffer));
+
+    /* ----------------- Left Calf---------------*/
+    stackCoordinates(left_knee_buffer, left_ankle_buffer, g_vertex_leftcalf_buffer);
+    generateVAO(&Left_CalfArrayID, &left_calf_vertexbuffer, g_vertex_leftcalf_buffer, sizeof(g_vertex_leftcalf_buffer));
+
 
     cout << glGetError() << endl;
     //clear
@@ -289,6 +297,18 @@ static void init()
     line_prog->addAttribute("vertPos");
 
     cam->init(window);
+}
+
+static void render_line(GLuint vb) {
+    int h_pos;
+    h_pos = line_prog->getAttribute("vertPos");
+    glEnableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, vb);
+    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
+
+    glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
+    glDisableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 static void render()
@@ -469,26 +489,10 @@ static void render()
     glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
     glDisableVertexAttribArray(h_pos);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    //Draw rightThigh
-    h_pos = line_prog->getAttribute("vertPos");
-    glEnableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, right_thigh_vertexbuffer);
-    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-
-    glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
-    glDisableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    //Draw leftThigh
-    h_pos = line_prog->getAttribute("vertPos");
-    glEnableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, left_thigh_vertexbuffer);
-    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-
-    glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
-    glDisableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
+    render_line(right_thigh_vertexbuffer);
+    render_line(left_thigh_vertexbuffer);
+    render_line(left_calf_vertexbuffer);
 
     line_prog->unbind();
 
