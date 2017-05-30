@@ -49,6 +49,11 @@ static GLfloat g_vertex_rightthigh_buffer[NUM_COORDS * 2]; // All lines will hav
 static GLfloat g_vertex_leftthigh_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
 static GLfloat g_vertex_rightcalf_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
 static GLfloat g_vertex_leftcalf_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_leftuarm_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_leftfarm_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_rightuarm_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_rightfarm_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+
 
 Texture texture0;
 GLint h_texture_0;
@@ -240,6 +245,26 @@ static void initGeom()
     stackCoordinates(left_knee_buffer, left_ankle_buffer, g_vertex_leftcalf_buffer);
     generateVAO(&Left_CalfArrayID, &left_calf_vertexbuffer, g_vertex_leftcalf_buffer, sizeof(g_vertex_leftcalf_buffer));
 
+    /* ----------------- Right Calf---------------*/
+    stackCoordinates(right_knee_buffer, right_ankle_buffer, g_vertex_rightcalf_buffer);
+    generateVAO(&Right_CalfArrayID, &right_calf_vertexbuffer, g_vertex_rightcalf_buffer, sizeof(g_vertex_rightcalf_buffer));
+
+    /* ----------------- Right Upper Arm---------------*/
+    stackCoordinates(right_shoulder, right_elbow, g_vertex_rightuarm_buffer);
+    generateVAO(&Right_Upperarm_ArrayID, &right_upperarm_vertexbuffer, g_vertex_rightuarm_buffer, sizeof(g_vertex_rightuarm_buffer));
+
+    /* ----------------- Left Upper Arm---------------*/
+    stackCoordinates(left_shoulder, left_elbow, g_vertex_leftuarm_buffer);
+    generateVAO(&Left_Upperarm_ArrayID, &left_upperarm_vertexbuffer, g_vertex_leftuarm_buffer, sizeof(g_vertex_leftuarm_buffer));
+
+    /* ----------------- Left ForeArm---------------*/
+    stackCoordinates(left_elbow, left_wrist, g_vertex_leftfarm_buffer);
+    generateVAO(&Left_ForearmArrayID, &left_forearm_vertexbuffer, g_vertex_leftfarm_buffer, sizeof(g_vertex_leftfarm_buffer));
+
+    /* ----------------- Right ForeArm---------------*/
+    stackCoordinates(right_elbow, right_wrist, g_vertex_rightfarm_buffer);
+    generateVAO(&Right_ForearmArrayID, &right_forearm_vertexbuffer, g_vertex_rightfarm_buffer, sizeof(g_vertex_rightfarm_buffer));
+
 
     cout << glGetError() << endl;
     //clear
@@ -430,69 +455,20 @@ static void render()
     glUniformMatrix4fv(line_prog->getUniform("V"), 1, GL_FALSE, V->topMatrix().data());
     glUniformMatrix4fv(line_prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
 
-    //Draw waist lines
-    h_pos = line_prog->getAttribute("vertPos");
-    glEnableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, full_waist_vertexbuffer);
-    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-
-    glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
-    glDisableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    //Draw shoulder lines
-    h_pos = line_prog->getAttribute("vertPos");
-    glEnableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, shoulders_vertexbuffer);
-    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-
-    glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
-    glDisableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    //Draw neckpoint
-    h_pos = line_prog->getAttribute("vertPos");
-    glEnableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, neck_vertexbuffer);
-    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-
-    glDrawArrays(GL_POINTS, t, 1); // TODO: adding a time based amt here
-    glDisableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    //Draw forehead
-    h_pos = line_prog->getAttribute("vertPos");
-    glEnableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, forehead_vertexbuffer);
-    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-
-    glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
-    glDisableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    //Draw leftface
-    h_pos = line_prog->getAttribute("vertPos");
-    glEnableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, leftface_vertexbuffer);
-    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-
-    glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
-    glDisableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    //Draw rightface
-    h_pos = line_prog->getAttribute("vertPos");
-    glEnableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, rightface_vertexbuffer);
-    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-
-    glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
-    glDisableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    
+    render_line(full_waist_vertexbuffer);
+    render_line(shoulders_vertexbuffer);
+    // render_line(neck_vertexbuffer);
+    render_line(forehead_vertexbuffer);
+    render_line(leftface_vertexbuffer);
+    render_line(rightface_vertexbuffer);
     render_line(right_thigh_vertexbuffer);
     render_line(left_thigh_vertexbuffer);
     render_line(left_calf_vertexbuffer);
+    render_line(right_calf_vertexbuffer);
+    render_line(right_upperarm_vertexbuffer);
+    render_line(right_forearm_vertexbuffer);
+    render_line(left_upperarm_vertexbuffer);
+    render_line(left_forearm_vertexbuffer);
 
     line_prog->unbind();
 

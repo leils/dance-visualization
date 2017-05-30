@@ -42,4 +42,16 @@ GLuint right_calf_vertexbuffer;
 GLuint Left_CalfArrayID;
 GLuint left_calf_vertexbuffer;
 
+GLuint Left_Upperarm_ArrayID;
+GLuint left_upperarm_vertexbuffer;
+
+GLuint Left_ForearmArrayID;
+GLuint left_forearm_vertexbuffer;
+
+GLuint Right_Upperarm_ArrayID;
+GLuint right_upperarm_vertexbuffer;
+
+GLuint Right_ForearmArrayID;
+GLuint right_forearm_vertexbuffer;
+
 #endif
