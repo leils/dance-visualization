@@ -25,6 +25,7 @@ using namespace Eigen;
 GLFWwindow *window; // Main application window
 string RESOURCE_DIR = ""; // Where the resources are loaded from
 shared_ptr<Program> ribbon_prog, line_prog;
+double last_time, current_time;
 
 Camera *cam = new Camera();
 // Ribbon *testRibbon = new Ribbon(right_knee_buffer);
@@ -59,7 +60,7 @@ Texture texture0;
 GLint h_texture_0;
 
 int g_width, g_height;
-int t;
+int num_frames;
 
 // Eye vectors for viewpoint moving
 Vector3f eye = Vector3f();
@@ -120,7 +121,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
     } else if (key == GLFW_KEY_DOWN) {
         phi -= .1; // turn the eye downward
     } else if (key == GLFW_KEY_R) {
-        t = 0;
+        num_frames = 0;
     }
 }
 
@@ -277,7 +278,8 @@ static void initGeom()
 static void init()
 {
     GLSL::checkVersion();
-    t = 0;
+    num_frames = 0;
+    current_time = glfwGetTime();
     // Set background color.
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     // Enable z-buffer test.
@@ -331,7 +333,7 @@ static void render_line(GLuint vb) {
     glBindBuffer(GL_ARRAY_BUFFER, vb);
     glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
-    glDrawArrays(GL_LINES, t * 2, 2); // TODO: adding a time based amt here
+    glDrawArrays(GL_LINES, num_frames * 2, 2); // TODO: adding a time based amt here
     glDisableVertexAttribArray(h_pos);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -359,7 +361,7 @@ static void render()
     lookAtPt = Vector3f(cos(phi) * cos (theta), sin(phi), cos(phi) * cos((M_PI / 2) - theta)) + eye;
     calculate_directions();
 
-    if (t > 100){
+    if (num_frames > 100){
         cam->mouseTracking(window, TIMESTEP);
     } else {
         glfwSetCursorPos(window, 320, 240);
@@ -382,7 +384,7 @@ static void render()
     M->scale(.5);
         glUniformMatrix4fv(ribbon_prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
         //set up pulling of vertices
-        int num_to_draw = t * 9;
+        int num_to_draw = num_frames * 6;
         int h_pos, h_nor, v, tex;
         h_pos = h_nor = v = -1;
 
@@ -476,7 +478,7 @@ static void render()
     M->popMatrix();
     P->popMatrix();
 
-    t++;
+    num_frames++;
 }
 
 int main(int argc, char **argv)
