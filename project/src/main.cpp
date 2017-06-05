@@ -148,12 +148,12 @@ static void initGeom()
     //generate vertex buffer to hand off to OGL
     convertVertices(right_ankle_buffer, g_vertex_right_ankle_buffer);
     compute_normals(g_vertex_right_ankle_buffer, g_vertex_right_ankle_normal_buffer);
-    walkTriangles(g_vertex_right_ankle_buffer, right_ankle_color_buffer);
+    // walkTriangles(g_vertex_right_ankle_buffer, right_ankle_color_buffer);
     textureWalk(g_vertex_right_ankle_buffer, right_ankle_tex_buffer);
 
     convertVertices(left_ankle_buffer, g_vertex_left_ankle_buffer);
     compute_normals(g_vertex_left_ankle_buffer, g_vertex_left_ankle_normal_buffer);
-    walkTriangles(g_vertex_left_ankle_buffer, left_ankle_color_buffer);
+    // walkTriangles(g_vertex_left_ankle_buffer, left_ankle_color_buffer);
     textureWalk(g_vertex_left_ankle_buffer, left_ankle_tex_buffer);
 
 
@@ -379,7 +379,7 @@ static void render()
     M->pushMatrix();
     M->loadIdentity();
 
-    M->translate(Vector3f(0, -10, -20));
+    M->translate(Vector3f(0, -10, -15));
     M->rotate(-90, Vector3f(1, 0, 0)); //Rotate by 90 degrees for correct orientation
     M->scale(.5);
         glUniformMatrix4fv(ribbon_prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());

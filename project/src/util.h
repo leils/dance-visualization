@@ -5,6 +5,8 @@
 #define NUM_MULT 6 // Each coordinate generates 5 other coordinates (vertices of the triangle)
 #define NUM_ALL (NUM_COORDS * NUM_MULT)
 #define TIMESTEP .05
+#define MAX_HEIGHT 2.0 
+#define MAX_DIST .7
 
 void normalize_vector(float v[3])
 {
@@ -39,6 +41,12 @@ void calc_normal(float v[3][3], float out[3])
    normalize_vector(out);
 }
 
+/*
+ * Normals are stored in a normal buffer, 1:1 with the vertices.
+ * That is, each one of the vertices stored here (in the triangles) gets a copy of
+ * the normal for that triangle. So for a given triangle, its normal n will get stored
+ * three times.
+ */
 void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
 {
     int idx1, idx2, idx3;
@@ -83,17 +91,24 @@ void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
         norm_buffer[idx3+2] = norm[2];
     }
 }
-/*
- * Normals are stored in a normal buffer, 1:1 with the vertices.
- * That is, each one of the vertices stored here (in the triangles) gets a copy of
- * the normal for that triangle. So for a given triangle, its normal n will get stored
- * three times.
- */
+
+static float calculate_height(float ax, float ay, float az, float bx, float by, float bz){
+    /* Calculate the distance between a anb b,
+        The smaller the distance, the larger the height should be */
+
+    float dist = sqrt(pow((bx - ax), 2) + pow((by - ay), 2) + pow((bz - az), 2));
+    float displacement = (1 -(dist / MAX_DIST)) * MAX_HEIGHT;
+
+    return(displacement);
+}
+
+/* Convert a single list of vertices into a buffer of triangle vertices */
 static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[])
 {
     GLfloat ax, ay, az, prime_ay, bx, by, bz, prime_by;
     int j = 0;
     int i;
+    float displacement = 0.5;
     for (i = 0; i < NUM_COORDS - 3; i = i + 3) {
         ax = in_buffer[i];
         ay = in_buffer[i + 1];
@@ -101,8 +116,9 @@ static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[])
         bx = in_buffer[i + 3];
         by = in_buffer[i + 4];
         bz = in_buffer[i + 5];
-        prime_ay = ay - .5;
-        prime_by = by - .5;
+        displacement = calculate_height(ax, ay, az, bx, by, bz);
+        prime_ay = ay - displacement;
+        prime_by = by - displacement;
 
         // TRIANGLE 1
         // Push A
