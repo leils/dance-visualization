@@ -12,16 +12,46 @@ GLuint Left_AnkleColorID;
 GLuint Left_AnkleTextureID;
 GLuint left_ankle_vertexbuffer;
 
-GLuint Left_WaistArrayID;
-GLuint left_waist_vertexbuffer;
+GLuint Full_WaistArrayID;
+GLuint full_waist_vertexbuffer;
 
-GLuint Right_WaistArrayID;
-GLuint right_waist_vertexbuffer;
+GLuint ShouldersArrayID;
+GLuint shoulders_vertexbuffer;
 
-GLuint Right_KneeArrayID;
-GLuint right_knee_vertexbuffer;
+GLuint NeckArrayID;
+GLuint neck_vertexbuffer;
 
-GLuint Left_KneeArrayID;
-GLuint left_knee_vertexbuffer;
+GLuint ForeheadArrayID;
+GLuint forehead_vertexbuffer;
+
+GLuint LeftFaceArrayID;
+GLuint leftface_vertexbuffer;
+
+GLuint RightFaceArrayID;
+GLuint rightface_vertexbuffer;
+
+GLuint Right_ThighArrayID;
+GLuint right_thigh_vertexbuffer;
+
+GLuint Left_ThighArrayID;
+GLuint left_thigh_vertexbuffer;
+
+GLuint Right_CalfArrayID;
+GLuint right_calf_vertexbuffer;
+
+GLuint Left_CalfArrayID;
+GLuint left_calf_vertexbuffer;
+
+GLuint Left_Upperarm_ArrayID;
+GLuint left_upperarm_vertexbuffer;
+
+GLuint Left_ForearmArrayID;
+GLuint left_forearm_vertexbuffer;
+
+GLuint Right_Upperarm_ArrayID;
+GLuint right_upperarm_vertexbuffer;
+
+GLuint Right_ForearmArrayID;
+GLuint right_forearm_vertexbuffer;
 
 #endif

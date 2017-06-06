@@ -10,18 +10,14 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #include "GLSL.h"
 #include "Program.h"
 #include "MatrixStack.h"
-#include "shape.h"
+// #include "shape.h"
 #include "Camera.h"
 #include "util.h"
-#include "Texture.h"
+#include "texture.h"
 #include "data.h"
 #include "buffer_structs.h"
 // #include "Ribbon.h"
 
-#define NUM_COORDS (401 * 3) // Number of coordinates in each section of the swing dancing mocap
-#define NUM_MULT 6 // Each coordinate generates 5 other coordinates (vertices of the triangle)
-#define NUM_ALL (NUM_COORDS * NUM_MULT)
-#define TIMESTEP .05
 
 using namespace std;
 using namespace Eigen;
@@ -29,6 +25,8 @@ using namespace Eigen;
 GLFWwindow *window; // Main application window
 string RESOURCE_DIR = ""; // Where the resources are loaded from
 shared_ptr<Program> ribbon_prog, line_prog;
+double last_time, current_time;
+int e_left, e_right, e_fwd, e_bwd = 0;
 
 Camera *cam = new Camera();
 // Ribbon *testRibbon = new Ribbon(right_knee_buffer);
@@ -44,11 +42,26 @@ static GLfloat g_vertex_left_ankle_normal_buffer[NUM_ALL];
 static GLfloat left_ankle_color_buffer[NUM_ALL/ 3];
 static GLfloat left_ankle_tex_buffer[(NUM_ALL/ 3) * 2]; // Texture is 2d, and 1 set of texture coords per actual coordinate
 
+static GLfloat g_vertex_waist_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_shoulder_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_forehead_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_leftface_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_rightface_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_rightthigh_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_leftthigh_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_rightcalf_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_leftcalf_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_leftuarm_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_leftfarm_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_rightuarm_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+static GLfloat g_vertex_rightfarm_buffer[NUM_COORDS * 2]; // All lines will have 2 points: 6 coordinates
+
+
 Texture texture0;
 GLint h_texture_0;
 
 int g_width, g_height;
-int t;
+int num_frames;
 
 // Eye vectors for viewpoint moving
 Vector3f eye = Vector3f();
@@ -81,247 +94,112 @@ static void calculate_directions()
     }
 }
 
-// TODO: Timestep this
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GL_TRUE);
-    } else if (key == GLFW_KEY_A) {
-        eye -= eye_right / 5; // Move eye left
-        cam->moveRight(-1, TIMESTEP);
-    } else if (key == GLFW_KEY_D) {
-        eye += eye_right / 5; // Move eye right
-        cam->moveRight(1, TIMESTEP);
-    } else if (key == GLFW_KEY_W) {
-        eye += eye_forward / 5; // Move eye forward
-        cam->moveFwd(1, TIMESTEP);
-    } else if (key == GLFW_KEY_S) {
-        eye -= eye_forward / 5; // Move eye backward
-        cam->moveFwd(-1, TIMESTEP);
-    } else if (key == GLFW_KEY_RIGHT) {
-        // theta defines l/r of the view. Positive to the right.
-        theta += .1; // turn eye to the right
-    } else if (key == GLFW_KEY_LEFT) {
-        theta -= .1; // turn the eye to the left
-    } else if (key == GLFW_KEY_UP) {
-        // phi defines u/d of the view. Positive up.
-        phi += .1; // turn the eye upward
-    } else if (key == GLFW_KEY_DOWN) {
-        phi -= .1; // turn the eye downward
+    if (action == GLFW_PRESS)
+    {
+        switch(key){
+            case GLFW_KEY_ESCAPE:
+                glfwSetWindowShouldClose(window, GL_TRUE);
+                break;
+            case GLFW_KEY_A:
+                e_left = 1;
+                break;
+            case GLFW_KEY_D:
+                e_right = 1;
+                break;
+            case GLFW_KEY_W:
+                e_fwd = 1;
+                break;
+            case GLFW_KEY_S:
+                e_bwd = 1;
+                break;
+            case GLFW_KEY_R:
+                num_frames = 0;
+        }
+    } else if (action == GLFW_RELEASE) {
+        switch(key){
+            case GLFW_KEY_A:
+                e_left = 0;
+                break;
+            case GLFW_KEY_D:
+                e_right = 0;
+                break;
+            case GLFW_KEY_W:
+                e_fwd = 0;
+                break;
+            case GLFW_KEY_S:
+                e_bwd = 0;
+                break;
+        }
+
     }
 }
 
+static void update_camera() {
+        // if (key == GLFW_KEY_ESCAPE) {
+        //     glfwSetWindowShouldClose(window, GL_TRUE);
+        // } else if (key == GLFW_KEY_A) {
+        //     // Move eye left
+        //     e_left = 1;
+        //     // cam->moveRight(-1, TIMESTEP);
+        // } else if (key == GLFW_KEY_D) {
+        //     // Move eye right
+        //     e_right = 1;
+        //     // cam->moveRight(1, TIMESTEP);
+        // } else if (key == GLFW_KEY_W) {
+        //     // Move eye forward
+        //     e_fwd = 1;
+        //     // cam->moveFwd(1, TIMESTEP);
+        // } else if (key == GLFW_KEY_S) {
+        //     // Move eye backward
+        //     e_bwd = 1;
+        //     // cam->moveFwd(-1, TIMESTEP);
+        // } else if (key == GLFW_KEY_R) {
+        //     num_frames = 0;
+        // }
+    if (e_left) {
+        cam->moveRight(-1, TIMESTEP);
+    } if (e_right) {
+        cam->moveRight(1, TIMESTEP);
+    } if (e_fwd) {
+        cam->moveFwd(1, TIMESTEP);
+    } if (e_bwd) {
+        cam->moveFwd(-1, TIMESTEP);
+    }
+}
 
 static void resize_callback(GLFWwindow *window, int width, int height) {
     g_width = width;
     g_height = height;
     glViewport(0, 0, width, height);
 }
-// calc_normal
 
-void compute_normals(GLfloat vert_buffer[], GLfloat norm_buffer[])
-{
-    int idx1, idx2, idx3;
-    float v[3][3];
-    float norm[3];
+static void generateVAO(GLuint *ArrayID, GLuint *vertexbuffer, GLfloat g_vb[], int vb_size){
+    glGenVertexArrays(1, ArrayID);
+    glBindVertexArray(*ArrayID);
 
-    // cout << "full length: " << NUM_MULT * NUM_COORDS << endl;
-
-    for (int i = 0; i < (NUM_ALL)/3; i+=3) {
-        //All the vertices should be in order in the first place ...
-        idx1 = 3 * (i + 0);
-        idx2 = 3 * (i + 1);
-        idx3 = 3 * (i + 2);
-
-
-        //The below should be all of the vertices for 1 triangle
-        v[0][0] = vert_buffer[idx1+0];
-        v[0][1] = vert_buffer[idx1+1];
-        v[0][2] = vert_buffer[idx1+2];
-
-        v[1][0]= vert_buffer[idx2+0];
-        v[1][1]= vert_buffer[idx2+1];
-        v[1][2]= vert_buffer[idx2+2];
-
-        v[2][0]= vert_buffer[idx3+0];
-        v[2][1]= vert_buffer[idx3+1];
-        v[2][2]= vert_buffer[idx3+2];
-
-
-        calc_normal(v, norm);
-
-        norm_buffer[idx1+0] = norm[0];
-        norm_buffer[idx2+0] = norm[0];
-        norm_buffer[idx3+0] = norm[0];
-
-        norm_buffer[idx1+1] = norm[1];
-        norm_buffer[idx2+1] = norm[1];
-        norm_buffer[idx3+1] = norm[1];
-
-        norm_buffer[idx1+2] = norm[2];
-        norm_buffer[idx2+2] = norm[2];
-        norm_buffer[idx3+2] = norm[2];
-    }
+    // Right_Ankle Vertex Buffer
+    glGenBuffers(1, vertexbuffer);
+    //set the current state to focus on our vertex buffer
+    glBindBuffer(GL_ARRAY_BUFFER, *vertexbuffer);
+    //actually memcopy the data - only do this once
+    glBufferData(GL_ARRAY_BUFFER, vb_size, g_vb, GL_DYNAMIC_DRAW);
 }
-
-/*
- * Normals are stored in a normal buffer, 1:1 with the vertices.
- * That is, each one of the vertices stored here (in the triangles) gets a copy of
- * the normal for that triangle. So for a given triangle, its normal n will get stored
- * three times.
- */
-static void convertVertices(GLfloat in_buffer[], GLfloat out_buffer[])
-{
-    GLfloat ax, ay, az, prime_ay, bx, by, bz, prime_by;
-    int j = 0;
-    int i;
-    for (i = 0; i < NUM_COORDS - 3; i = i + 3) {
-        ax = in_buffer[i];
-        ay = in_buffer[i + 1];
-        az = in_buffer[i + 2];
-        bx = in_buffer[i + 3];
-        by = in_buffer[i + 4];
-        bz = in_buffer[i + 5];
-        prime_ay = ay - .5;
-        prime_by = by - .5;
-
-        // TRIANGLE 1
-        // Push A
-        out_buffer[j++] = ax;
-        out_buffer[j++] = ay;
-        out_buffer[j++] = az;
-
-        // Push A'
-        out_buffer[j++] = ax;
-        out_buffer[j++] = prime_ay;
-        out_buffer[j++] = az;
-
-        // Push B
-        out_buffer[j++] = bx;
-        out_buffer[j++] = by;
-        out_buffer[j++] = bz;
-
-        // TRIANGLE 2
-        // Push B
-        out_buffer[j++] = bx;
-        out_buffer[j++] = by;
-        out_buffer[j++] = bz;
-
-        // Push A'
-        out_buffer[j++] = ax;
-        out_buffer[j++] = prime_ay;
-        out_buffer[j++] = az;
-
-        // Push B'
-        out_buffer[j++] = bx;
-        out_buffer[j++] = prime_by;
-        out_buffer[j++] = bz;
-
-    }
-    // printf("Converted vertices, i = %d\n", i);
-}
-
-void walkTriangles(GLfloat in_buffer[], GLfloat out_buffer[])
-{
-    int i;
-    float j = 0.0;
-    for (i = 0; i * 3 < NUM_COORDS * NUM_MULT; i++){ //Walking by vertex (3 floats) in in_buffer
-        if (i % 100 == 0) {//Changes colors every 100 listed vertices
-            j += .2;
-            if (j >= 1.0){
-                j = 0.0;
-            }
-        }
-        out_buffer[i] = j;
-    }
-}
-
-void textureWalk(GLfloat in_buffer[], GLfloat out_buffer[])
-{
-    int i, j;
-    j = 0;
-    // essentially i want to input per 6 listed vertices
-    // a, b, c, c, b, d
-    // (0, 1), (0, 0), (1, 1), (1, 1), (0, 0), (1, 0)
-    // that makes 12 floats
-    // each vertex in the in_buffer is 3 floats
-    // each coordinate in the out_buffer is 2 floats
-
-    // Stretched out: 18
-    for(i = 0; i < NUM_ALL; i+=(6 * 3 * 3)){ // 6*3 is 6 vertices * 3 floats each * 3 squares
-        //Square 1
-        out_buffer[j++] = 0;
-        out_buffer[j++] = 1;
-
-        out_buffer[j++] = 0;
-        out_buffer[j++] = 0;
-
-        out_buffer[j++] = .3;
-        out_buffer[j++] = 1;
-
-        out_buffer[j++] = .3;
-        out_buffer[j++] = 1;
-
-        out_buffer[j++] = 0;
-        out_buffer[j++] = 0;
-
-        out_buffer[j++] = .3;
-        out_buffer[j++] = 0;
-
-        //Square 2
-        out_buffer[j++] = .3;
-        out_buffer[j++] = 1;
-
-        out_buffer[j++] = .3;
-        out_buffer[j++] = 0;
-
-        out_buffer[j++] = .6;
-        out_buffer[j++] = 1;
-
-        out_buffer[j++] = .6;
-        out_buffer[j++] = 1;
-
-        out_buffer[j++] = .3;
-        out_buffer[j++] = 0;
-
-        out_buffer[j++] = .6;
-        out_buffer[j++] = 0;
-
-        //Square 3
-        out_buffer[j++] = .6;
-        out_buffer[j++] = 1;
-
-        out_buffer[j++] = .6;
-        out_buffer[j++] = 0;
-
-        out_buffer[j++] = 1;
-        out_buffer[j++] = 1;
-
-        out_buffer[j++] = 1;
-        out_buffer[j++] = 1;
-
-        out_buffer[j++] = .6;
-        out_buffer[j++] = 0;
-
-        out_buffer[j++] = 1;
-        out_buffer[j++] = 0;
-
-    }
-}
-
 
 static void initGeom()
 {
     //generate vertex buffer to hand off to OGL
     convertVertices(right_ankle_buffer, g_vertex_right_ankle_buffer);
     compute_normals(g_vertex_right_ankle_buffer, g_vertex_right_ankle_normal_buffer);
-    walkTriangles(g_vertex_right_ankle_buffer, right_ankle_color_buffer);
+    // walkTriangles(g_vertex_right_ankle_buffer, right_ankle_color_buffer);
     textureWalk(g_vertex_right_ankle_buffer, right_ankle_tex_buffer);
 
     convertVertices(left_ankle_buffer, g_vertex_left_ankle_buffer);
     compute_normals(g_vertex_left_ankle_buffer, g_vertex_left_ankle_normal_buffer);
-    walkTriangles(g_vertex_left_ankle_buffer, left_ankle_color_buffer);
+    // walkTriangles(g_vertex_left_ankle_buffer, left_ankle_color_buffer);
     textureWalk(g_vertex_left_ankle_buffer, left_ankle_tex_buffer);
+
 
     /* -------------------ANKLE----------------- */
     //generate the VAO
@@ -373,37 +251,64 @@ static void initGeom()
     glBindBuffer(GL_ARRAY_BUFFER, Left_AnkleTextureID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(left_ankle_tex_buffer), left_ankle_tex_buffer, GL_STATIC_DRAW);
 
-    /* ----------------- Left Waist ---------------*/
-    glGenVertexArrays(1, &Left_WaistArrayID);
-    glBindVertexArray(Left_WaistArrayID);
+    /* ----------------- Full Waist ---------------*/
+    stackCoordinates(right_front_waist, left_front_waist, g_vertex_waist_buffer);
+    generateVAO(&Full_WaistArrayID, &full_waist_vertexbuffer, g_vertex_waist_buffer, sizeof(g_vertex_waist_buffer));
 
-    glGenBuffers(1, &left_waist_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, left_waist_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(left_front_waist), left_front_waist, GL_DYNAMIC_DRAW);
+    /* ----------------- Full Waist ---------------*/
+    stackCoordinates(right_shoulder, left_shoulder, g_vertex_shoulder_buffer);
+    generateVAO(&ShouldersArrayID, &shoulders_vertexbuffer, g_vertex_shoulder_buffer, sizeof(g_vertex_shoulder_buffer));
 
-    /* ----------------- Right Waist ---------------*/
-    glGenVertexArrays(1, &Right_WaistArrayID);
-    glBindVertexArray(Right_WaistArrayID);
+    /* ----------------- Neck ---------------*/
+    generateVAO(&NeckArrayID, &neck_vertexbuffer, back_neck, sizeof(back_neck));
 
-    glGenBuffers(1, &right_waist_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, right_waist_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(right_front_waist), right_front_waist, GL_DYNAMIC_DRAW);
+    /* ----------------- Forehead ---------------*/
+    stackCoordinates(front_left_head, front_right_head, g_vertex_forehead_buffer);
+    generateVAO(&ForeheadArrayID, &forehead_vertexbuffer, g_vertex_forehead_buffer, sizeof(g_vertex_forehead_buffer));
 
-    /* ----------------- Left Knee---------------*/
-    glGenVertexArrays(1, &Left_KneeArrayID);
-    glBindVertexArray(Left_KneeArrayID);
+    /* ----------------- Left Face ---------------*/
+    stackCoordinates(front_left_head, back_neck, g_vertex_leftface_buffer);
+    generateVAO(&LeftFaceArrayID, &leftface_vertexbuffer, g_vertex_leftface_buffer, sizeof(g_vertex_leftface_buffer));
 
-    glGenBuffers(1, &left_knee_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, left_knee_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(left_knee_buffer), left_knee_buffer, GL_DYNAMIC_DRAW);
+    /* ----------------- Right Face ---------------*/
+    stackCoordinates(front_right_head, back_neck, g_vertex_rightface_buffer);
+    generateVAO(&RightFaceArrayID, &rightface_vertexbuffer, g_vertex_rightface_buffer, sizeof(g_vertex_rightface_buffer));
 
-    /* ----------------- Right Knee---------------*/
-    glGenVertexArrays(1, &Right_KneeArrayID);
-    glBindVertexArray(Right_KneeArrayID);
+    /* ----------------- Right Thigh---------------*/
+    stackCoordinates(right_front_waist, right_knee_buffer, g_vertex_rightthigh_buffer);
+    generateVAO(&Right_ThighArrayID, &right_thigh_vertexbuffer, g_vertex_rightthigh_buffer, sizeof(g_vertex_rightthigh_buffer));
 
-    glGenBuffers(1, &right_knee_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, right_knee_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(right_knee_buffer), right_knee_buffer, GL_DYNAMIC_DRAW);
+    /* ----------------- Left Thigh---------------*/
+    stackCoordinates(left_front_waist, left_knee_buffer, g_vertex_leftthigh_buffer);
+    generateVAO(&Left_ThighArrayID, &left_thigh_vertexbuffer, g_vertex_leftthigh_buffer, sizeof(g_vertex_leftthigh_buffer));
+
+    /* ----------------- Right Calf---------------*/
+    stackCoordinates(right_knee_buffer, right_ankle_buffer, g_vertex_rightcalf_buffer);
+    generateVAO(&Right_CalfArrayID, &right_calf_vertexbuffer, g_vertex_rightcalf_buffer, sizeof(g_vertex_rightcalf_buffer));
+
+    /* ----------------- Left Calf---------------*/
+    stackCoordinates(left_knee_buffer, left_ankle_buffer, g_vertex_leftcalf_buffer);
+    generateVAO(&Left_CalfArrayID, &left_calf_vertexbuffer, g_vertex_leftcalf_buffer, sizeof(g_vertex_leftcalf_buffer));
+
+    /* ----------------- Right Calf---------------*/
+    stackCoordinates(right_knee_buffer, right_ankle_buffer, g_vertex_rightcalf_buffer);
+    generateVAO(&Right_CalfArrayID, &right_calf_vertexbuffer, g_vertex_rightcalf_buffer, sizeof(g_vertex_rightcalf_buffer));
+
+    /* ----------------- Right Upper Arm---------------*/
+    stackCoordinates(right_shoulder, right_elbow, g_vertex_rightuarm_buffer);
+    generateVAO(&Right_Upperarm_ArrayID, &right_upperarm_vertexbuffer, g_vertex_rightuarm_buffer, sizeof(g_vertex_rightuarm_buffer));
+
+    /* ----------------- Left Upper Arm---------------*/
+    stackCoordinates(left_shoulder, left_elbow, g_vertex_leftuarm_buffer);
+    generateVAO(&Left_Upperarm_ArrayID, &left_upperarm_vertexbuffer, g_vertex_leftuarm_buffer, sizeof(g_vertex_leftuarm_buffer));
+
+    /* ----------------- Left ForeArm---------------*/
+    stackCoordinates(left_elbow, left_wrist, g_vertex_leftfarm_buffer);
+    generateVAO(&Left_ForearmArrayID, &left_forearm_vertexbuffer, g_vertex_leftfarm_buffer, sizeof(g_vertex_leftfarm_buffer));
+
+    /* ----------------- Right ForeArm---------------*/
+    stackCoordinates(right_elbow, right_wrist, g_vertex_rightfarm_buffer);
+    generateVAO(&Right_ForearmArrayID, &right_forearm_vertexbuffer, g_vertex_rightfarm_buffer, sizeof(g_vertex_rightfarm_buffer));
 
 
     cout << glGetError() << endl;
@@ -417,13 +322,14 @@ static void initGeom()
 static void init()
 {
     GLSL::checkVersion();
-    t = 0;
+    num_frames = 0;
+    current_time = glfwGetTime();
     // Set background color.
-    glClearColor(.56f, .56f, .56f, 1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     // Enable z-buffer test.
     glEnable(GL_DEPTH_TEST);
-    // glPointSize(10.0f);
-    glLineWidth(100.0f);
+    glPointSize(10.0f);
+    // glLineWidth(100.0f); NOT WORKING: ???
 
     initGeom();
 
@@ -464,6 +370,18 @@ static void init()
     cam->init(window);
 }
 
+static void render_line(GLuint vb) {
+    int h_pos;
+    h_pos = line_prog->getAttribute("vertPos");
+    glEnableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, vb);
+    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
+
+    glDrawArrays(GL_LINES, num_frames * 2, 2); // TODO: adding a time based amt here
+    glDisableVertexAttribArray(h_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 static void render()
 {
     // Get current frame buffer size.
@@ -487,7 +405,7 @@ static void render()
     lookAtPt = Vector3f(cos(phi) * cos (theta), sin(phi), cos(phi) * cos((M_PI / 2) - theta)) + eye;
     calculate_directions();
 
-    if (t > 100){
+    if (num_frames > 100){
         cam->mouseTracking(window, TIMESTEP);
     } else {
         glfwSetCursorPos(window, 320, 240);
@@ -505,12 +423,12 @@ static void render()
     M->pushMatrix();
     M->loadIdentity();
 
-    M->translate(Vector3f(0, -10, -20));
+    M->translate(Vector3f(0, -10, -15));
     M->rotate(-90, Vector3f(1, 0, 0)); //Rotate by 90 degrees for correct orientation
     M->scale(.5);
         glUniformMatrix4fv(ribbon_prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
         //set up pulling of vertices
-        int num_to_draw = t * 9;
+        int num_to_draw = num_frames * 6;
         int h_pos, h_nor, v, tex;
         h_pos = h_nor = v = -1;
 
@@ -583,25 +501,20 @@ static void render()
     glUniformMatrix4fv(line_prog->getUniform("V"), 1, GL_FALSE, V->topMatrix().data());
     glUniformMatrix4fv(line_prog->getUniform("M"), 1, GL_FALSE, M->topMatrix().data());
 
-    // Draw points on Left Waist
-    h_pos = line_prog->getAttribute("vertPos");
-    glEnableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, left_waist_vertexbuffer);
-    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-
-    glDrawArrays(GL_LINES, 0, NUM_COORDS); // TODO: adding a time based amt here
-    glDisableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // Draw points on Right Waist
-    h_pos = line_prog->getAttribute("vertPos");
-    glEnableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, right_waist_vertexbuffer);
-    glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
-
-    glDrawArrays(GL_LINES, 0, NUM_COORDS); // TODO: adding a time based amt here
-    glDisableVertexAttribArray(h_pos);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    render_line(full_waist_vertexbuffer);
+    render_line(shoulders_vertexbuffer);
+    // render_line(neck_vertexbuffer);
+    render_line(forehead_vertexbuffer);
+    render_line(leftface_vertexbuffer);
+    render_line(rightface_vertexbuffer);
+    render_line(right_thigh_vertexbuffer);
+    render_line(left_thigh_vertexbuffer);
+    render_line(left_calf_vertexbuffer);
+    render_line(right_calf_vertexbuffer);
+    render_line(right_upperarm_vertexbuffer);
+    render_line(right_forearm_vertexbuffer);
+    render_line(left_upperarm_vertexbuffer);
+    render_line(left_forearm_vertexbuffer);
 
     line_prog->unbind();
 
@@ -609,7 +522,7 @@ static void render()
     M->popMatrix();
     P->popMatrix();
 
-    t++;
+    num_frames++;
 }
 
 int main(int argc, char **argv)
@@ -668,6 +581,7 @@ int main(int argc, char **argv)
     // Loop until the user closes the window.
     while (!glfwWindowShouldClose(window)) {
         // Render scene.
+        update_camera();
         render();
         // Swap front and back buffers.
         glfwSwapBuffers(window);
