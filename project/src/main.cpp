@@ -26,6 +26,7 @@ shared_ptr<Program> ribbon_prog, line_prog;
 double last_time, current_time;
 int e_left, e_right, e_fwd, e_bwd = 0;
 int drag_frames = 0; // boolean to switch dragging frames on skeleton
+int paused = 0;
 
 
 Camera *cam = new Camera();
@@ -116,8 +117,13 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                 break;
             case GLFW_KEY_R:
                 num_frames = 0;
+                break;
             case GLFW_KEY_SPACE:
+                paused = 1 - paused;
+                break;
+            case GLFW_KEY_L:
                 drag_frames = 1 - drag_frames;
+                break;
         }
     } else if (action == GLFW_RELEASE) {
         switch(key){
@@ -528,7 +534,9 @@ static void render()
     M->popMatrix();
     P->popMatrix();
 
-    num_frames++;
+    if (paused == 0) {
+        num_frames++;
+    }
 
     if (num_frames > NUM_ORIGINAL_FRAMES) {
         num_frames = 0;
