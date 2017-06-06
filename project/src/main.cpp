@@ -405,7 +405,7 @@ static void render()
     lookAtPt = Vector3f(cos(phi) * cos (theta), sin(phi), cos(phi) * cos((M_PI / 2) - theta)) + eye;
     calculate_directions();
 
-    if (num_frames > 100){
+    if (glfwGetTime() > 1){
         cam->mouseTracking(window, TIMESTEP);
     } else {
         glfwSetCursorPos(window, 320, 240);
@@ -523,6 +523,10 @@ static void render()
     P->popMatrix();
 
     num_frames++;
+
+    if (num_frames > NUM_ORIGINAL_FRAMES) {
+        num_frames = 0;
+    }
 }
 
 int main(int argc, char **argv)

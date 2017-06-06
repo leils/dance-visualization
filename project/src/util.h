@@ -1,11 +1,12 @@
 #ifndef _UTIL_H_
 #define _UTIL_H_
 
+#define NUM_ORIGINAL_FRAMES  401
 #define NUM_COORDS (401 * 3) // Number of coordinates in each section of the swing dancing mocap
 #define NUM_MULT 6 // Each coordinate generates 5 other coordinates (vertices of the triangle)
 #define NUM_ALL (NUM_COORDS * NUM_MULT)
 #define TIMESTEP .05
-#define MAX_HEIGHT 1.5 
+#define MAX_HEIGHT 1.5
 #define MAX_DIST .7
 
 void normalize_vector(float v[3])
