@@ -5,7 +5,7 @@
 #define NUM_MULT 6 // Each coordinate generates 5 other coordinates (vertices of the triangle)
 #define NUM_ALL (NUM_COORDS * NUM_MULT)
 #define TIMESTEP .05
-#define MAX_HEIGHT 2.0 
+#define MAX_HEIGHT 1.5 
 #define MAX_DIST .7
 
 void normalize_vector(float v[3])
@@ -97,7 +97,7 @@ static float calculate_height(float ax, float ay, float az, float bx, float by, 
         The smaller the distance, the larger the height should be */
 
     float dist = sqrt(pow((bx - ax), 2) + pow((by - ay), 2) + pow((bz - az), 2));
-    float displacement = (1 -(dist / MAX_DIST)) * MAX_HEIGHT;
+    float displacement = pow((1 -(dist / MAX_DIST)) * MAX_HEIGHT, 2);
 
     return(displacement);
 }

@@ -26,6 +26,7 @@ GLFWwindow *window; // Main application window
 string RESOURCE_DIR = ""; // Where the resources are loaded from
 shared_ptr<Program> ribbon_prog, line_prog;
 double last_time, current_time;
+int e_left, e_right, e_fwd, e_bwd = 0;
 
 Camera *cam = new Camera();
 // Ribbon *testRibbon = new Ribbon(right_knee_buffer);
@@ -93,35 +94,78 @@ static void calculate_directions()
     }
 }
 
-// TODO: Timestep this
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GL_TRUE);
-    } else if (key == GLFW_KEY_A) {
-        eye -= eye_right / 5; // Move eye left
+    if (action == GLFW_PRESS)
+    {
+        switch(key){
+            case GLFW_KEY_ESCAPE:
+                glfwSetWindowShouldClose(window, GL_TRUE);
+                break;
+            case GLFW_KEY_A:
+                e_left = 1;
+                break;
+            case GLFW_KEY_D:
+                e_right = 1;
+                break;
+            case GLFW_KEY_W:
+                e_fwd = 1;
+                break;
+            case GLFW_KEY_S:
+                e_bwd = 1;
+                break;
+            case GLFW_KEY_R:
+                num_frames = 0;
+        }
+    } else if (action == GLFW_RELEASE) {
+        switch(key){
+            case GLFW_KEY_A:
+                e_left = 0;
+                break;
+            case GLFW_KEY_D:
+                e_right = 0;
+                break;
+            case GLFW_KEY_W:
+                e_fwd = 0;
+                break;
+            case GLFW_KEY_S:
+                e_bwd = 0;
+                break;
+        }
+
+    }
+}
+
+static void update_camera() {
+        // if (key == GLFW_KEY_ESCAPE) {
+        //     glfwSetWindowShouldClose(window, GL_TRUE);
+        // } else if (key == GLFW_KEY_A) {
+        //     // Move eye left
+        //     e_left = 1;
+        //     // cam->moveRight(-1, TIMESTEP);
+        // } else if (key == GLFW_KEY_D) {
+        //     // Move eye right
+        //     e_right = 1;
+        //     // cam->moveRight(1, TIMESTEP);
+        // } else if (key == GLFW_KEY_W) {
+        //     // Move eye forward
+        //     e_fwd = 1;
+        //     // cam->moveFwd(1, TIMESTEP);
+        // } else if (key == GLFW_KEY_S) {
+        //     // Move eye backward
+        //     e_bwd = 1;
+        //     // cam->moveFwd(-1, TIMESTEP);
+        // } else if (key == GLFW_KEY_R) {
+        //     num_frames = 0;
+        // }
+    if (e_left) {
         cam->moveRight(-1, TIMESTEP);
-    } else if (key == GLFW_KEY_D) {
-        eye += eye_right / 5; // Move eye right
+    } if (e_right) {
         cam->moveRight(1, TIMESTEP);
-    } else if (key == GLFW_KEY_W) {
-        eye += eye_forward / 5; // Move eye forward
+    } if (e_fwd) {
         cam->moveFwd(1, TIMESTEP);
-    } else if (key == GLFW_KEY_S) {
-        eye -= eye_forward / 5; // Move eye backward
+    } if (e_bwd) {
         cam->moveFwd(-1, TIMESTEP);
-    } else if (key == GLFW_KEY_RIGHT) {
-        // theta defines l/r of the view. Positive to the right.
-        theta += .1; // turn eye to the right
-    } else if (key == GLFW_KEY_LEFT) {
-        theta -= .1; // turn the eye to the left
-    } else if (key == GLFW_KEY_UP) {
-        // phi defines u/d of the view. Positive up.
-        phi += .1; // turn the eye upward
-    } else if (key == GLFW_KEY_DOWN) {
-        phi -= .1; // turn the eye downward
-    } else if (key == GLFW_KEY_R) {
-        num_frames = 0;
     }
 }
 
@@ -537,6 +581,7 @@ int main(int argc, char **argv)
     // Loop until the user closes the window.
     while (!glfwWindowShouldClose(window)) {
         // Render scene.
+        update_camera();
         render();
         // Swap front and back buffers.
         glfwSwapBuffers(window);
