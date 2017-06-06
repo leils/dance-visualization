@@ -10,13 +10,11 @@ CPE 471 Cal Poly Z. Wood + S. Sueda
 #include "GLSL.h"
 #include "Program.h"
 #include "MatrixStack.h"
-// #include "shape.h"
 #include "Camera.h"
 #include "util.h"
 #include "texture.h"
 #include "data.h"
 #include "buffer_structs.h"
-// #include "Ribbon.h"
 
 
 using namespace std;
@@ -27,6 +25,8 @@ string RESOURCE_DIR = ""; // Where the resources are loaded from
 shared_ptr<Program> ribbon_prog, line_prog;
 double last_time, current_time;
 int e_left, e_right, e_fwd, e_bwd = 0;
+int drag_frames = 0; // boolean to switch dragging frames on skeleton
+
 
 Camera *cam = new Camera();
 // Ribbon *testRibbon = new Ribbon(right_knee_buffer);
@@ -116,6 +116,8 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                 break;
             case GLFW_KEY_R:
                 num_frames = 0;
+            case GLFW_KEY_SPACE:
+                drag_frames = 1 - drag_frames;
         }
     } else if (action == GLFW_RELEASE) {
         switch(key){
@@ -377,7 +379,12 @@ static void render_line(GLuint vb) {
     glBindBuffer(GL_ARRAY_BUFFER, vb);
     glVertexAttribPointer(h_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0); //function to get # of elements at a time
 
-    glDrawArrays(GL_LINES, num_frames * 2, 2); // TODO: adding a time based amt here
+    if (drag_frames == 1) {
+        glDrawArrays(GL_LINES, 0, num_frames * 2); // TODO: adding a time based amt here
+    } else {
+        glDrawArrays(GL_LINES, num_frames * 2, 2); // TODO: adding a time based amt here
+    }
+
     glDisableVertexAttribArray(h_pos);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -503,7 +510,6 @@ static void render()
 
     render_line(full_waist_vertexbuffer);
     render_line(shoulders_vertexbuffer);
-    // render_line(neck_vertexbuffer);
     render_line(forehead_vertexbuffer);
     render_line(leftface_vertexbuffer);
     render_line(rightface_vertexbuffer);
