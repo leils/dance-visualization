@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<title>Dance Visualization - Senior Project</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+<link rel="stylesheet" href="style/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+body {font-family: "Lato", sans-serif}
+.mySlides {display: none}
+</style>
+<body>
+
+    <!-- Navbar -->
+    <div class="w3-top">
+      <div class="w3-bar w3-black w3-card-2">
+        <a class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" href="javascript:void(0)" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
+        <a href="#" class="w3-bar-item w3-button w3-padding-large">TOP</a>
+        <a href="#Results" class="w3-bar-item w3-button w3-padding-large w3-hide-small">RESULTS</a>
+        <a href="#ProgramImplementation" class="w3-bar-item w3-button w3-padding-large w3-hide-small">IMPLMENTATION</a>
+        <a href="javascript:void(0)" class="w3-padding-large w3-hover-red w3-hide-small w3-right"><i class="fa fa-search"></i></a>
+      </div>
+    </div>
+
+    <!-- Navbar on small screens -->
+    <div id="navDemo" class="w3-bar-block w3-black w3-hide w3-hide-large w3-hide-medium w3-top" style="margin-top:46px">
+      <a href="#band" class="w3-bar-item w3-button w3-padding-large">BAND</a>
+    </div>
+
+    <!-- Page content -->
+    <div class="w3-content" style="max-width:2000px;margin-top:62px">
+
+        <!-- Automatic Slideshow Images -->
+        <div class="mySlides w3-display-container w3-center">
+            <img src="images/Sproj_Draglines1.png" height="360">
+            <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small">
+            </div>
+        </div>
+
+        <div class="mySlides w3-display-container w3-center">
+            <img src="images/VR_Skeleton.png" height="360">
+            <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small">
+            </div>
+        </div>
+
+        <div class="mySlides w3-display-container w3-center">
+            <img src="images/Sproj_1.png" height="360">
+            <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small">
+            </div>
+        </div>
+
+        <div class="mySlides w3-display-container w3-center">
+            <img src="images/Sproj_brushstrokes.png" height="360">
+            <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small">
+            </div>
+        </div>
+
+        <!-- The Band Section -->
+        <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="Abstract">
+            <hr>
+            <h2 class="w3-wide">DANCE VISUALIZATION</h2>
+            <p class="w3-opacity"><i>Artistic Rendering of Dance Movement<br>Senior Project by Leia Chang</i></p>
+            <p class="w3-justify">
+                This project aims to explore different outlets for artistic rendering of
+                dance movement. Here, motion captured dancer movement is visualized in
+                3d via an OpenGL graphics pipeline, portraying the dancer as a skeleton
+                with various ribbons tracing the dancers' movements through space.
+            </p>
+
+            <h3 class="w3-wide">Introduction</h3>
+            <p class="w3-justify">
+                Dance is an art form that exists in all cultures across the globe.
+                However, it can be difficult to share dances across cultural boundaries
+                or levels of experience; various dances embody different forms of
+                bodily movement, and what is inherent to certain cultures can be wholly
+                absent in another.
+                <br>
+                <br>
+                The audience of a dance show can see the movements of
+                the dancers, and can understand the larger architecture of choreography.
+                However, many audience members may find themselves at a loss when
+                attempting to gather a deeper understanding of the dance; Body mechanics
+                and feelings can be unfathomable to those who have never tried it. Even
+                those who indeed already have backgrounds in dance may be at a loss for
+                what it might feel like to pursue another form of the art. This project
+                intends to explore a new representation of dance movement that allows a
+                viewer to gain an intuition about the form the dance takes, as well as
+                give dancers an extra dimension of expression to explore.
+            </p>
+        </div>
+
+        <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="Results">
+            <hr>
+            <h2 class="w3-wide">PROGRAM RESULTS</h2>
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/UM49-pOVOd8" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+
+        <!-- Program Implementation -->
+        <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="ProgramImplementation">
+            <hr>
+            <h2 class="w3-wide">PROGRAM IMPLEMENTATION</h2>
+            <h3 class="w3-wide">Program Overview</h3>
+            <p class="w3-justify">
+                The pipeline for this program starts with C3D motion captured files.
+                These C3D files require extra processing, and so here two sets of
+                python scripts are used to separate and reorganize the data provided.
+                Once pre-processed, this data is ported into the main rendering program.
+                In this program, the data is loaded into buffers to be sent to the GPU,
+                and are partially rendered based on time. The render style is based on
+                pre-processed features, and is outlined below.<br><br>
+            </p>
+
+            <h3 class="w3-wide">Motion-Capture Data: Retrieval and Reformatting</h3>
+            <p class="w3-justify">
+                The data used in this pipeline is in the C3D format. This format was
+                chosen simply because of its common availability for the type of motion
+                desired; all motion capture data used was sourced from the CMU Graphics
+                Lab Motion Capture Database. This file format packs data into bits as
+                closely as possible, making its size much smaller, but making the format
+                harder to work with. However, this data type is a proprietary type, and
+                all software created to read and use this file type is limited to usage
+                on the Windows OS.<br> <br>To make data easier to work with, files of the
+                C3D format were converted to a generic CSV file format. This
+                unfortunately also strips the file of its metadata, leaving only raw
+                point values. To access the data and retrieve all associated data
+                points, it was necessary to convert the file into an additional text
+                file, where all metadata was listed (Including the order in which points
+                of the body were stored).<br><br> Two python scripts are then used on this
+                generic CSV file, retrieving the user-defined body part and subsequently
+                resizing the data for on-screen viewing. This processed data is then
+                saved as subsequent CSV files, which can be imported into other programs
+                or (as seen in this project) directly copied into data structures.
+            </p>
+
+            <h3 class="w3-wide">Artistic Rendering: OpenGL Pipeline</h3>
+            <p class="w3-justify">
+                Data intending to be used for ribbon creation is processed in an additional
+                step. In this separate pipeline, each vertex pulled from the motion-capture data
+                is combined with its adjacent vertices to create a third new point. These
+                pre-existing and newly created points are replicated into a new buffer, ordered
+                such that they create the vertices of the triangles to be rendered by the GPU.
+                The GPU accesses these buffers based on time, each frame adding another set of
+                trian- gles to the number it will render. This serves as the animation for the
+                ribbons.<br><br> In order to provide a more artistic rendering, the distance
+                between adjacent points is taken into account during triangle creation. As the
+                vertices from the original motion-capture data are listed chronologically, each
+                vertex is compared to its predecessor to determine its distance. As each vertex
+                is a datapoint taken at equidistant intervals of time, we can determine that
+                further distances are instances where the measured point is moving at a faster
+                rate. In order to achieve a more artistic brush-like stroke, faster curves are
+                painted with a thinner stroke, and areas where the body part lingered in space
+                are painted with thicker or heavier strokes. This creates a more dynamic effect,
+                as seen below in Figure 2.
+
+            </p>
+            <h3 class="w3-wide">Movement and Size Context: Skeletal Rendering</h3>
+            <p class="w3-justify">
+                To give context to the previously rendered ribbons, it was necessary to provide
+                a skeleton of the dancer as well. This created both a sense of scale and
+                orientation, as well as made the move- ments more intuitive.<br><br> The
+                skeletal data is processed separately from ankle-ribbon data. In order to render
+                the skele- ton as a series of lines as desired, the vertex representations must
+                be linked together as ‘bones’. Because the original motion capture data does not
+                have any representation of linked body parts, these parts are manually chosen
+                and then ‘stacked’ into line segments. This stack- ing is done by intermixing
+                vertices from the ‘bone’ endpoints, essentially creating a new buffer of
+                vertices in sets of two, each representing the bone in space at the time of data
+                capture.<br><br> Two modes allow for different viewing of the skeletal movement -
+                the first simply renders the skeleton moving over time, while the second shows
+                all of the positions that the skeleton has taken from the beginning of the data.
+                This second mode provides a more solidified understand- ing of the movement.
+            </p>
+
+            <h3 class="w3-wide">Mobile VR Port</h3>
+            <p class="w3-justify">
+                Porting this same motion-capture rendering into VR was desirable in order to
+                provide a more intuitive sense of space not available on a 2D screen. A
+                secondary desire was for the VR expe- rience to be available for viewing without
+                desktop setup and specialized equipment; Thus, the project was aimed for mobile
+                VR experiences.<br><br> Through Unity, the motion-capture data is loaded via a
+                custom CSV reader. These vertices are then used to determine the translation to
+                be applied to a custom object in the scene (in this case, a simple sphere and
+                cube are used to represent the ankles of the dancer). These objects are assigned
+                target locations retrieved from the position buffers based on current position.
+                We perform a LERP interpolation onto the object’s path, with the start point
+                being its current position, and the end point being the next position
+                retrieved from the list. As the object reaches the next target position, we
+                increment the end point to be the subsequently listed position. This translates
+                the object smoothly through space and along the path of the dancers as captured
+                in our data.<br><br> To visualize this path similarly to the ribbons in OpenGL,
+                the objects have an added Trail Ren- derer component. This component traces the
+                object’s path in space with ribbon-like geometry. While this does not take into
+                account the speed of the movement, we are able to taper the rib- bon at its
+                start and end, creating a more dynamic ribbon, and providing the illusion of a
+                growing and shrinking trail.
+            </p>
+        </div>
+
+            <!-- <div class="w3-row w3-padding-32">
+            <div class="w3-third">
+            <p>Name</p>
+            <img src="/w3images/bandmember.jpg" class="w3-round w3-margin-bottom" alt="Random Name" style="width:60%">
+        </div>
+        <div class="w3-third">
+        <p>Name</p>
+        <img src="/w3images/bandmember.jpg" class="w3-round w3-margin-bottom" alt="Random Name" style="width:60%">
+    </div>
+    <div class="w3-third">
+    <p>Name</p>
+    <img src="/w3images/bandmember.jpg" class="w3-round" alt="Random Name" style="width:60%">
+</div>
+</div> -->
+</div>
+
+<!-- The Contact Section -->
+<hr>
+<div class="w3-container w3-content w3-padding-64" style="max-width:800px" id="contact">
+    <h2 class="w3-wide w3-center">CONTACT</h2>
+    <p class="w3-opacity w3-center"><i>Questions? Drop a note!</i></p>
+    <p class="w3-opacity w3-center"><i>e.leiachang@gmail.com</i></p>
+</div>
+
+<!-- End Page Content -->
+</div>
+
+<!-- Footer -->
+<footer class="w3-container w3-padding-64 w3-center w3-opacity w3-light-grey w3-xlarge">
+    <i class="fa fa-facebook-official w3-hover-opacity"></i>
+    <i class="fa fa-instagram w3-hover-opacity"></i>
+    <i class="fa fa-snapchat w3-hover-opacity"></i>
+    <i class="fa fa-pinterest-p w3-hover-opacity"></i>
+    <i class="fa fa-twitter w3-hover-opacity"></i>
+    <i class="fa fa-linkedin w3-hover-opacity"></i>
+</footer>
+
+<script>
+// Automatic Slideshow - change image every 4 seconds
+var myIndex = 0;
+carousel();
+
+function carousel() {
+    var i;
+    var x = document.getElementsByClassName("mySlides");
+    for (i = 0; i < x.length; i++) {
+        x[i].style.display = "none";
+    }
+    myIndex++;
+    if (myIndex > x.length) {myIndex = 1}
+    x[myIndex-1].style.display = "block";
+    setTimeout(carousel, 4000);
+}
+
+// Used to toggle the menu on small screens when clicking on the menu button
+function myFunction() {
+    var x = document.getElementById("navDemo");
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+    } else {
+        x.className = x.className.replace(" w3-show", "");
+    }
+}
+
+// When the user clicks anywhere outside of the modal, close it
+var modal = document.getElementById('ticketModal');
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
+
+</body>
+</html>
