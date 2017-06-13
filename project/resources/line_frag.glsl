@@ -10,7 +10,7 @@ void main()
     //float intensity;
 	//intensity = dot(lightDir ,normalize(fragNor));
 
-    color = vec4(1,0,0,1);
+    color = vec4(.351,.554,.883,1);
 
 
 }

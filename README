@@ -1,18 +1,13 @@
 Senior Project: Leia Chang
 
-TODO:
-- Refactor for better IO
-    - TinyObjLoader for csv?
-- Add mousetracking from 471 lab01
+To run the project:
+    ./s project/resources
 
-Data used for skeleton retrieval:
-- Left front waist
-- Right front waist
-- Right back head
-- Left back head
+Project controls:
+    Mouse for camera lookat
+    WASD for camera movement
+    L toggles skeletal mode
+    Space toggles pause/play
 
 
-Things I need to do:
-- Take out these coordinates (lwaist, rwaist)
-- Draw the line (lwaist to rwaist)
-    - How do we do this?
+C3D Data was retrieved from the CSU Motion Capture Database: http://mocap.cs.cmu.edu/subjects/93/93_06.c3d

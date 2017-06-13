@@ -15,17 +15,19 @@ body {font-family: "Lato", sans-serif}
     <!-- Navbar -->
     <div class="w3-top">
       <div class="w3-bar w3-black w3-card-2">
-        <a class="w3-bar-item w3-button w3-padding-large w3-hide-medium w3-hide-large w3-right" href="javascript:void(0)" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
         <a href="#" class="w3-bar-item w3-button w3-padding-large">TOP</a>
         <a href="#Results" class="w3-bar-item w3-button w3-padding-large w3-hide-small">RESULTS</a>
         <a href="#ProgramImplementation" class="w3-bar-item w3-button w3-padding-large w3-hide-small">IMPLMENTATION</a>
-        <a href="javascript:void(0)" class="w3-padding-large w3-hover-red w3-hide-small w3-right"><i class="fa fa-search"></i></a>
+        <a href="#Future" class="w3-bar-item w3-button w3-padding-large w3-hide-small">FUTURE</a>
       </div>
     </div>
 
     <!-- Navbar on small screens -->
     <div id="navDemo" class="w3-bar-block w3-black w3-hide w3-hide-large w3-hide-medium w3-top" style="margin-top:46px">
-      <a href="#band" class="w3-bar-item w3-button w3-padding-large">BAND</a>
+        <a href="#" class="w3-bar-item w3-button w3-padding-large">TOP</a>
+        <a href="#Results" class="w3-bar-item w3-button w3-padding-large w3-hide-small">RESULTS</a>
+        <a href="#ProgramImplementation" class="w3-bar-item w3-button w3-padding-large w3-hide-small">IMPLMENTATION</a>
+        <a href="#Future" class="w3-bar-item w3-button w3-padding-large w3-hide-small">FUTURE</a>
     </div>
 
     <!-- Page content -->
@@ -33,7 +35,7 @@ body {font-family: "Lato", sans-serif}
 
         <!-- Automatic Slideshow Images -->
         <div class="mySlides w3-display-container w3-center">
-            <img src="images/Sproj_Draglines1.png" height="360">
+            <img src="images/skeldrag2.png" height="360">
             <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small">
             </div>
         </div>
@@ -45,20 +47,32 @@ body {font-family: "Lato", sans-serif}
         </div>
 
         <div class="mySlides w3-display-container w3-center">
-            <img src="images/Sproj_1.png" height="360">
+            <img src="images/base2.png" height="360">
             <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small">
             </div>
         </div>
 
         <div class="mySlides w3-display-container w3-center">
-            <img src="images/Sproj_brushstrokes.png" height="360">
+            <img src="images/strokes.png" height="360">
             <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small">
             </div>
         </div>
 
+        <div class="mySlides w3-display-container w3-center">
+            <img src="images/VR_1.png" height="360">
+            <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small">
+            </div>
+        </div>
+
+        <div class="mySlides w3-display-container w3-center">
+            <img src="images/VR_2.png" height="360">
+            <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small">
+            </div>
+        </div>
+
+
         <!-- The Band Section -->
         <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="Abstract">
-            <hr>
             <h2 class="w3-wide">DANCE VISUALIZATION</h2>
             <p class="w3-opacity"><i>Artistic Rendering of Dance Movement<br>Senior Project by Leia Chang</i></p>
             <p class="w3-justify">
@@ -86,14 +100,37 @@ body {font-family: "Lato", sans-serif}
                 what it might feel like to pursue another form of the art. This project
                 intends to explore a new representation of dance movement that allows a
                 viewer to gain an intuition about the form the dance takes, as well as
-                give dancers an extra dimension of expression to explore.
+                give dancers an extra dimension of expression to explore.<br><br>
+                This project is a series of pipelines to visualize
+                motion-captured dance movement as a way to provide extra context
+                into the types of movement inherent in various styles of dance.
+                Working from pre-existing motion capture data, movement is
+                rendered using an OpenGL pipeline, with particular focus on
+                spatial representation and sustaining presence of motion.
+                Several areas of interest here are; the pre-processing of
+                motion-captured data, the generation of ribbon and brush-stroke
+                geometry, and integration of this project into virtual reality.
             </p>
         </div>
 
         <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="Results">
             <hr>
             <h2 class="w3-wide">PROGRAM RESULTS</h2>
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/UM49-pOVOd8" frameborder="0" allowfullscreen></iframe>
+            <iframe width="640" height="360" src="https://www.youtube.com/embed/UM49-pOVOd8" frameborder="0" allowfullscreen></iframe>
+            <p class="w3-justify">
+                As seen above, this program successfully portrays the movement
+                of the dancer. The in-program camera allows for the user to view
+                the dance from any angle, via the WASD keys and mouse-tracking.
+                The motion and rendering can be paused and restarted at any
+                point in time, using the space bar and the R key, respectively.
+                The L key toggles between the two modes.<br><br>
+                In the VR port, movement of the camera is controlled by the tilt
+                of the mobile phone. Movement is only triggered when the user
+                taps the screen. Additionally, the camera creates a trail as
+                well, allowing the user to create their own movement trails in
+                conjunction to those created by the motion-captured data. This
+                addition of user interaction really pulls the user into the
+                space and into a mode of creativity.<br><br>
         </div>
 
 
@@ -110,6 +147,8 @@ body {font-family: "Lato", sans-serif}
                 In this program, the data is loaded into buffers to be sent to the GPU,
                 and are partially rendered based on time. The render style is based on
                 pre-processed features, and is outlined below.<br><br>
+                The data used in this project can be found <a
+                href="http://mocap.cs.cmu.edu/subjects/93/93_06.c3d">here.</a><br><br>
             </p>
 
             <h3 class="w3-wide">Motion-Capture Data: Retrieval and Reformatting</h3>
@@ -135,6 +174,7 @@ body {font-family: "Lato", sans-serif}
             </p>
 
             <h3 class="w3-wide">Artistic Rendering: OpenGL Pipeline</h3>
+            <img src="images/strokes.png" style="height:360px">
             <p class="w3-justify">
                 Data intending to be used for ribbon creation is processed in an additional
                 step. In this separate pipeline, each vertex pulled from the motion-capture data
@@ -142,7 +182,7 @@ body {font-family: "Lato", sans-serif}
                 pre-existing and newly created points are replicated into a new buffer, ordered
                 such that they create the vertices of the triangles to be rendered by the GPU.
                 The GPU accesses these buffers based on time, each frame adding another set of
-                trian- gles to the number it will render. This serves as the animation for the
+                triangles to the number it will render. This serves as the animation for the
                 ribbons.<br><br> In order to provide a more artistic rendering, the distance
                 between adjacent points is taken into account during triangle creation. As the
                 vertices from the original motion-capture data are listed chronologically, each
@@ -151,33 +191,39 @@ body {font-family: "Lato", sans-serif}
                 further distances are instances where the measured point is moving at a faster
                 rate. In order to achieve a more artistic brush-like stroke, faster curves are
                 painted with a thinner stroke, and areas where the body part lingered in space
-                are painted with thicker or heavier strokes. This creates a more dynamic effect,
-                as seen below in Figure 2.
-
+                are painted with thicker or heavier strokes.
             </p>
             <h3 class="w3-wide">Movement and Size Context: Skeletal Rendering</h3>
+            <img src="images/base2.png" style="height:360px">
+            <img src="images/skeldrag3.png" style="height:360px">
             <p class="w3-justify">
                 To give context to the previously rendered ribbons, it was necessary to provide
                 a skeleton of the dancer as well. This created both a sense of scale and
                 orientation, as well as made the move- ments more intuitive.<br><br> The
                 skeletal data is processed separately from ankle-ribbon data. In order to render
-                the skele- ton as a series of lines as desired, the vertex representations must
+                the skeleton as a series of lines as desired, the vertex representations must
                 be linked together as ‘bones’. Because the original motion capture data does not
                 have any representation of linked body parts, these parts are manually chosen
-                and then ‘stacked’ into line segments. This stack- ing is done by intermixing
+                and then ‘stacked’ into line segments. This stacking is done by intermixing
                 vertices from the ‘bone’ endpoints, essentially creating a new buffer of
                 vertices in sets of two, each representing the bone in space at the time of data
                 capture.<br><br> Two modes allow for different viewing of the skeletal movement -
                 the first simply renders the skeleton moving over time, while the second shows
                 all of the positions that the skeleton has taken from the beginning of the data.
-                This second mode provides a more solidified understand- ing of the movement.
+                This second mode provides a more solidified understanding of the movement.
             </p>
 
             <h3 class="w3-wide">Mobile VR Port</h3>
+            <p class="w3-opacity">
+                <small>*Mobile VR Port was created in collaboration with Tyler
+                Dahl, whose valuable work also allowed for testing in both
+                Android and iOS environments.</small>
+            </p>
+            <img src="images/VR_Skeleton.png" style="height:360px">
             <p class="w3-justify">
                 Porting this same motion-capture rendering into VR was desirable in order to
                 provide a more intuitive sense of space not available on a 2D screen. A
-                secondary desire was for the VR expe- rience to be available for viewing without
+                secondary desire was for the VR experience to be available for viewing without
                 desktop setup and specialized equipment; Thus, the project was aimed for mobile
                 VR experiences.<br><br> Through Unity, the motion-capture data is loaded via a
                 custom CSV reader. These vertices are then used to determine the translation to
@@ -190,28 +236,46 @@ body {font-family: "Lato", sans-serif}
                 increment the end point to be the subsequently listed position. This translates
                 the object smoothly through space and along the path of the dancers as captured
                 in our data.<br><br> To visualize this path similarly to the ribbons in OpenGL,
-                the objects have an added Trail Ren- derer component. This component traces the
+                the objects have an added Trail Renderer component. This component traces the
                 object’s path in space with ribbon-like geometry. While this does not take into
-                account the speed of the movement, we are able to taper the rib- bon at its
+                account the speed of the movement, we are able to taper the ribbon at its
                 start and end, creating a more dynamic ribbon, and providing the illusion of a
                 growing and shrinking trail.
             </p>
         </div>
 
-            <!-- <div class="w3-row w3-padding-32">
-            <div class="w3-third">
-            <p>Name</p>
-            <img src="/w3images/bandmember.jpg" class="w3-round w3-margin-bottom" alt="Random Name" style="width:60%">
+        <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="Future">
+            <hr>
+            <h2 class="w3-wide">FUTURE WORK</h2>
+            <p class="w3-justify">
+                Though the pipeline for using this motion-captured data is in place, it still
+                requires much user input and intervention. Because many motion-capture datasets
+                are hand-labeled, body parts and vertices must be hand-picked from the labeling
+                scheme in order to be rendered. In the future, it would be advisable to make
+                this first step user-specified, and the automate the remaining parts (retrieval
+                of data, and conversion into spatially logical area). While the linking of bones
+                would still be necessary, being able to do this as a part of the program setup
+                would be ideal. Additionally, updating the pipeline to accommodate motion
+                capture file types would be an area for improvement in the future, as the
+                current pipeline uses a mixture of C3D and CSV files.<br><br> An original but unfeasible
+                goal for this project was to accumulate the data in real-time, or allow data to
+                be tracked by users themselves for rendering. At this time, positional tracking
+                through mobile devices is not possible. (Most positional tracking via mobile
+                devices is done through satellite tracking, which is sufficient for projects
+                requiring less fine-grain tracking such as Pokemon Go.)<br><br> Finally, an
+                area of future exploration (as an alternative to mobile VR) is to move this
+                project into full VR/AR integration with existing systems designed specifically
+                for this purpose. Some work has already been done in using controllers to motion
+                track movement beyond gestural movement, particularly as ‘windows’ between
+                dimensions (ie. between the real world and a virtual world). This work could be
+                continued into rendering live motion in VR, and overlaying this artistic
+                rendering into the real world via AR technologies.
+            </p>
         </div>
-        <div class="w3-third">
-        <p>Name</p>
-        <img src="/w3images/bandmember.jpg" class="w3-round w3-margin-bottom" alt="Random Name" style="width:60%">
-    </div>
-    <div class="w3-third">
-    <p>Name</p>
-    <img src="/w3images/bandmember.jpg" class="w3-round" alt="Random Name" style="width:60%">
-</div>
-</div> -->
+
+        <div class="w3-container w3-content w3-center w3-padding-64" style="max-width:800px" id="References">            <hr>            <h2 class="w3-wide">REFERENCES</h2>            <p>                Bill Wadman (n.d)<i>Dancers in Motion</i>. Retrieved from <a href="https://www.billwadman.com/motion/">link.</a><br><br>                Carnegie Mellon University (n.d) <i>CMU Graphics Lab Motion Capture Database</i>. LindyHop2 Retrieved from <a href="http://mocap.cs.cmu.edu/search.php">link.</a><br><br>                Dr. Andrew Danis (2016, November 6) <i>An Overview of the C3D File Design</i>. Retrieved from <a href="https://www.c3d.org/overview.html">link.</a><br><br>                <i>Enra, Japanese Performance Arts Company</i> (n.d) Retrieved from <a href="http://enra.jp/">link.</a><br><br>                Dock (2012, January 10) <i>CSVReader</i>. Retrieved from <a href="http://wiki.unity3d.com/index.php?title=CSVReader">link.</a><br><br>                Danny Bittman (2017, January 11) <i>Scrubbler | Tiltbrush in Real Life</i>. <a href="Retrieved from https://vimeo.com/198976363">link.</a><br><br>                <i>Getting Started in Google VR in Unity</i> (2017, April 18) Retrieved from <a href="https://developers.google.com/vr/unity/get-started">link.</a><br><br>                Steven Osman - Sony (2017, May 17) <i>Vision 2017 - Making Magic Across Both the Virtual and Real World at PlayStation</i>. Retrieved from <a href="https://youtu.be/d4ntbWK-jwc">link.</a><br><br>                <i>Tutorial 5: A Textured Cube</i> (n.d.) Retrieved from <a href="http://www.opengl-tutorial.org/beginners-tutorials/tutorial-5-a-textured-cube/">link.</a><br><br>
+                </p>
+
 </div>
 
 <!-- The Contact Section -->
@@ -227,13 +291,8 @@ body {font-family: "Lato", sans-serif}
 
 <!-- Footer -->
 <footer class="w3-container w3-padding-64 w3-center w3-opacity w3-light-grey w3-xlarge">
-    <i class="fa fa-facebook-official w3-hover-opacity"></i>
-    <i class="fa fa-instagram w3-hover-opacity"></i>
-    <i class="fa fa-snapchat w3-hover-opacity"></i>
-    <i class="fa fa-pinterest-p w3-hover-opacity"></i>
-    <i class="fa fa-twitter w3-hover-opacity"></i>
-    <i class="fa fa-linkedin w3-hover-opacity"></i>
-</footer>
+    <p class="w3-medium"><a href="leiac.me" target="_blank">Visit my Website</a></p>
+ </footer>
 
 <script>
 // Automatic Slideshow - change image every 4 seconds
@@ -250,24 +309,6 @@ function carousel() {
     if (myIndex > x.length) {myIndex = 1}
     x[myIndex-1].style.display = "block";
     setTimeout(carousel, 4000);
-}
-
-// Used to toggle the menu on small screens when clicking on the menu button
-function myFunction() {
-    var x = document.getElementById("navDemo");
-    if (x.className.indexOf("w3-show") == -1) {
-        x.className += " w3-show";
-    } else {
-        x.className = x.className.replace(" w3-show", "");
-    }
-}
-
-// When the user clicks anywhere outside of the modal, close it
-var modal = document.getElementById('ticketModal');
-window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
 }
 </script>
 
